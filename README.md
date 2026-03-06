@@ -1,6 +1,7 @@
 # Team Name
 
 ### Team Members
+James Clunes, Joseph Kowalczyk, Brooke Fandrich
 
 ### Final Proposal
 1. Persona/Scenario
