@@ -1,1 +1,4 @@
-/*insert style here*/
+/* Stylesheet, 2026, by Joseph Kowalczyk, James Clunes, and Brooke Fandrich */
+#map {
+    height: 98.416vh; /* Height of the map ~98.5% of the client window, takes up most of the client window without causing a scroll bar */
+}
