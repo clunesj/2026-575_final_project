@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>CommonGood | Profile</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body class="app-page">
+        <div class="app-shell profile-shell">
+            <header class="profile-header">
+                <div class="profile-header-inner">
+                    <a class="profile-brand" href="home.html">CommonGood</a>
+                    <span class="profile-header-divider" aria-hidden="true"></span>
+                    <h1 class="profile-title">Manage Your Profile</h1>
+                </div>
+                <div class="app-actions">
+                    <span class="session-badge" id="session-badge">Tester mode</span>
+                    <a class="profile-link active-nav-link" href="profile.html">Profile</a>
+                    <a class="profile-link" href="location.html">Locations</a>
+                    <a class="logout-link" href="index.html" id="logout-link">Log out</a>
+                </div>
+            </header>
+
+            <main class="profile-main">
+                <div class="profile-card">
+
+                    <div class="profile-photo-row">
+                        <div class="profile-avatar-wrap">
+                            <img
+                                id="profile-avatar"
+                                class="profile-avatar"
+                                src="img/avatar-placeholder.svg"
+                                alt="Your profile photo"
+                            >
+                        </div>
+                        <div class="profile-photo-meta">
+                            <p class="profile-photo-label">Profile Photo</p>
+                            <p class="profile-photo-hint">Update your public avatar</p>
+                            <button class="change-photo-btn" id="change-photo-btn" type="button">
+                                Change Photo
+                            </button>
+                            <input
+                                id="photo-input"
+                                type="file"
+                                accept="image/*"
+                                aria-label="Upload profile photo"
+                                hidden
+                            >
+                        </div>
+                    </div>
+
+                    <form class="profile-form" id="profile-form" novalidate>
+                        <div class="profile-fields">
+                            <div class="profile-field">
+                                <label for="profile-name">Full Name</label>
+                                <input
+                                    id="profile-name"
+                                    name="fullName"
+                                    type="text"
+                                    placeholder="Your full name"
+                                    autocomplete="name"
+                                >
+                            </div>
+                            <div class="profile-field">
+                                <label for="profile-email">Email Address</label>
+                                <input
+                                    id="profile-email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="name@example.com"
+                                    autocomplete="email"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="profile-form-footer">
+                            <p class="profile-save-status" id="profile-save-status" aria-live="polite"></p>
+                            <button class="primary-button profile-save-btn" type="submit">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </main>
+        </div>
+
+        <script type="text/javascript" src="js/profile.js"></script>
+    </body>
+</html>

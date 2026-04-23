@@ -4,11 +4,56 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-            <title></title>
-         <link rel="stylesheet" href="css/style.css">
+        <title>CommonGood | Locations</title>
+        <link rel="stylesheet" href="css/style.css">
     </head>
 
-    <body>
+    <body class="app-page">
+        <div class="app-shell locations-shell">
+            <header class="profile-header">
+                <div class="profile-header-inner">
+                    <a class="profile-brand" href="home.html">CommonGood</a>
+                    <span class="profile-header-divider" aria-hidden="true"></span>
+                    <h1 class="profile-title">Locations</h1>
+                </div>
+                <div class="app-actions">
+                    <span class="session-badge" id="session-badge">Tester mode</span>
+                    <a class="profile-link" href="profile.html">Profile</a>
+                    <a class="profile-link active-nav-link" href="location.html">Locations</a>
+                    <a class="primary-button" href="add.html" style="width:auto;margin-top:0;padding:0 1.4rem;text-decoration:none;">+ Create Location</a>
+                    <a class="logout-link" href="index.html" id="logout-link">Log out</a>
+                </div>
+            </header>
 
+            <main class="locations-main">
+
+                <aside class="locations-sidebar">
+                    <p class="locations-section-label">Your Profile</p>
+                    <div class="locations-profile-card">
+                        <img
+                            id="sidebar-avatar"
+                            class="locations-avatar"
+                            src="img/avatar-placeholder.svg"
+                            alt="Your profile photo"
+                        >
+                        <div class="locations-profile-meta">
+                            <p class="locations-profile-name" id="sidebar-name">Guest Tester</p>
+                            <p class="locations-profile-since">Member since 2026</p>
+                        </div>
+                    </div>
+                    <a class="secondary-button locations-edit-btn" href="profile.html">Edit Profile</a>
+                </aside>
+
+                <section class="locations-content">
+                    <p class="locations-section-label">Favorite Locations</p>
+                    <div class="locations-placeholder" aria-label="No favorite locations yet">
+                        <p class="locations-placeholder-text">Add locations to your favorites!</p>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+
+        <script type="text/javascript" src="js/locations.js"></script>
     </body>
 </html>

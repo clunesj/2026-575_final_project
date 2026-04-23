@@ -1,14 +1,38 @@
 <!-- a good placeholder for "account management" stuff, where you view your favs, etc -->
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
-            <title></title>
-         <link rel="stylesheet" href="css/style.css">
+        <title>CommonGood | Map</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="lib/dist/leaflet.css">
+        <script src="lib/dist/leaflet.js"></script>
     </head>
 
-    <body>
+    <body class="app-page">
+        <div class="app-shell">
+            <header class="app-header">
+                <div>
+                    <p class="app-kicker">CommonGood</p>
+                    <h1>Community resource map</h1>
+                </div>
 
+                <div class="app-actions">
+                    <span class="session-badge" id="session-badge">Tester mode</span>
+                    <a class="profile-link" href="profile.html">Profile</a>
+                    <a class="profile-link" href="location.html">Locations</a>
+                    <a class="logout-link" href="index.html" id="logout-link">Log out</a>
+                </div>
+            </header>
+
+            <p class="session-helper" id="session-helper"></p>
+
+            <main class="map-shell">
+                <div id="map"></div>
+            </main>
+        </div>
+
+        <script type="text/javascript" src="js/main.js"></script>
     </body>
 </html>

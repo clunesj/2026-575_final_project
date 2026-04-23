@@ -1,4 +1,910 @@
 /* Stylesheet, 2026, by Joseph Kowalczyk, James Clunes, and Brooke Fandrich */
+:root {
+    --bg: #f4efe6;
+    --surface: #fffdf8;
+    --surface-strong: #f0e3d1;
+    --text: #1d3127;
+    --muted: #5f6f64;
+    --accent: #35624a;
+    --accent-strong: #234535;
+    --line: rgba(29, 49, 39, 0.14);
+    --shadow: 0 24px 60px rgba(25, 38, 31, 0.14);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+}
+
+body {
+    min-height: 100vh;
+}
+
+.login-page {
+    background:
+        radial-gradient(circle at top left, rgba(118, 151, 127, 0.22), transparent 32%),
+        linear-gradient(135deg, #f8f2e8 0%, #e9f0e7 100%);
+}
+
+.login-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1.15fr 0.95fr;
+}
+
+.login-hero,
+.login-panel {
+    padding: 4.5rem;
+}
+
+.login-hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.eyebrow,
+.card-kicker,
+.app-kicker {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.login-hero h1,
+.app-header h1 {
+    margin: 0;
+    line-height: 1.05;
+}
+
+.login-hero h1 {
+    max-width: 11ch;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+}
+
+.hero-copy,
+.card-copy,
+.session-helper {
+    margin: 0;
+    max-width: 34rem;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+.hero-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.hero-highlights span,
+.session-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255, 253, 248, 0.72);
+    font-weight: 700;
+    font-size: 0.92rem;
+}
+
+.login-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    width: min(100%, 31rem);
+    padding: 2.5rem;
+    border-radius: 1.8rem;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: var(--shadow);
+}
+
+.login-card h2 {
+    margin: 0.6rem 0 0.8rem;
+    font-size: 2rem;
+}
+
+.login-form {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.8rem;
+}
+
+.login-form label {
+    font-weight: 700;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 0.95rem;
+    border: 1px solid rgba(29, 49, 39, 0.18);
+    background: #fff;
+    font: inherit;
+    color: var(--text);
+}
+
+.login-form input:focus {
+    outline: 2px solid rgba(53, 98, 74, 0.18);
+    border-color: var(--accent);
+}
+
+.primary-button,
+.secondary-button,
+.logout-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 3.2rem;
+    margin-top: 1rem;
+    border-radius: 999px;
+    border: none;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.primary-button {
+    background: var(--accent);
+    color: #fff;
+}
+
+.primary-button:hover,
+.primary-button:focus,
+.logout-link:hover,
+.logout-link:focus {
+    background: var(--accent-strong);
+}
+
+.secondary-button {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid rgba(53, 98, 74, 0.3);
+}
+
+.secondary-button:hover,
+.secondary-button:focus {
+    background: rgba(53, 98, 74, 0.08);
+}
+
+.primary-button:hover,
+.primary-button:focus,
+.secondary-button:hover,
+.secondary-button:focus,
+.logout-link:hover,
+.logout-link:focus {
+    transform: translateY(-1px);
+}
+
+.app-page {
+    padding: 1.5rem;
+}
+
+.app-shell {
+    min-height: calc(100vh - 3rem);
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 1rem;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.app-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.app-header h1 {
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+.logout-link {
+    width: auto;
+    margin-top: 0;
+    padding: 0 1.4rem;
+    background: var(--accent);
+    color: #fff;
+}
+
+.map-shell {
+    overflow: hidden;
+    border-radius: 1.5rem;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+}
+
 #map {
-    height: 98.416vh; /* Height of the map ~98.5% of the client window, takes up most of the client window without causing a scroll bar */
+    height: calc(100vh - 11.5rem);
+    min-height: 32rem;
+}
+
+/* ── Profile page ── */
+
+.profile-shell {
+    grid-template-rows: auto 1fr;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+}
+
+.profile-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-brand {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+}
+
+.profile-brand:hover,
+.profile-brand:focus {
+    color: var(--accent-strong);
+}
+
+.profile-header-divider {
+    display: block;
+    width: 1px;
+    height: 1.4rem;
+    background: var(--line);
+}
+
+.profile-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.profile-main {
+    padding-top: 2rem;
+}
+
+.profile-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Avatar row */
+
+.profile-photo-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.profile-avatar-wrap {
+    flex-shrink: 0;
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--line);
+    background: var(--surface-strong);
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-photo-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.profile-photo-label {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.profile-photo-hint {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--muted);
+}
+
+.change-photo-btn {
+    margin-top: 0.6rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    width: fit-content;
+}
+
+.change-photo-btn:hover,
+.change-photo-btn:focus {
+    background: var(--surface-strong);
+    transform: translateY(-1px);
+}
+
+/* Form fields */
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.profile-field label {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.profile-field input {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 0.95rem;
+    border: 1px solid rgba(29, 49, 39, 0.18);
+    background: #fff;
+    font: inherit;
+    color: var(--text);
+}
+
+.profile-field input:focus {
+    outline: 2px solid rgba(53, 98, 74, 0.18);
+    border-color: var(--accent);
+}
+
+.profile-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.profile-save-btn {
+    width: auto;
+    margin-top: 0;
+    padding: 0 2rem;
+}
+
+.profile-save-status {
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-height: 1.2em;
+}
+
+.profile-save-ok {
+    color: var(--accent);
+}
+
+.profile-save-error {
+    color: #c0392b;
+}
+
+/* ── Active nav state ── */
+
+.active-nav-link {
+    background: var(--surface-strong);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ── Locations page ── */
+
+.locations-shell {
+    grid-template-rows: auto 1fr;
+}
+
+.locations-main {
+    display: grid;
+    grid-template-columns: 18rem 1fr;
+    gap: 1.5rem;
+    padding-top: 2rem;
+    align-items: start;
+}
+
+.locations-section-label {
+    margin: 0 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.locations-sidebar {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.locations-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.locations-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--line);
+    background: var(--surface-strong);
+    flex-shrink: 0;
+}
+
+.locations-profile-name {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.locations-profile-since {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.locations-edit-btn {
+    width: 100%;
+    margin-top: 0;
+    font-size: 0.9rem;
+    min-height: 2.8rem;
+}
+
+.locations-content {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow);
+    padding: 1.75rem;
+}
+
+.locations-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--line);
+    border-radius: 1rem;
+    background: var(--surface-strong);
+    aspect-ratio: 1 / 1;
+    max-width: 28rem;
+}
+
+.locations-placeholder-text {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: center;
+    padding: 1rem;
+}
+
+@media (max-width: 900px) {
+    .locations-main {
+        grid-template-columns: 1fr;
+    }
+
+    .locations-placeholder {
+        aspect-ratio: unset;
+        min-height: 12rem;
+    }
+}
+
+.profile-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.2rem;
+    min-height: 3.2rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.profile-link:hover,
+.profile-link:focus {
+    background: var(--surface-strong);
+    transform: translateY(-1px);
+}
+
+/* ── Create Location page ── */
+
+.create-location-shell {
+    grid-template-rows: auto 1fr;
+}
+
+.create-location-main {
+    display: grid;
+    grid-template-columns: 16rem 1fr;
+    gap: 1.5rem;
+    padding-top: 2rem;
+    align-items: start;
+}
+
+.create-location-sidebar {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.create-location-sidebar-label {
+    margin: 0 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--muted);
+    text-decoration: none;
+    cursor: default;
+    transition: background-color 0.15s ease;
+}
+
+.sidebar-nav-item.active {
+    background: var(--surface-strong);
+    color: var(--text);
+}
+
+.sidebar-nav-item.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.sidebar-nav-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--line);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+}
+
+.sidebar-nav-item.active .sidebar-nav-step {
+    background: var(--accent);
+    color: #fff;
+}
+
+.create-location-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.create-location-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+}
+
+.create-location-card h2 {
+    margin: 0 0 1.5rem;
+    font-size: 1.35rem;
+}
+
+/* Banner photo upload */
+
+.banner-upload-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.75rem;
+    border: 2px dashed var(--line);
+    border-radius: 1rem;
+    background: var(--surface-strong);
+    min-height: 11rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-upload-zone:hover {
+    border-color: var(--accent);
+    background: #e8f0eb;
+}
+
+.banner-upload-zone.has-image {
+    border-style: solid;
+    border-color: var(--accent);
+}
+
+.banner-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    border-radius: 0.875rem;
+    display: none;
+}
+
+.banner-upload-zone.has-image .banner-preview {
+    display: block;
+}
+
+.banner-upload-zone.has-image .banner-upload-hint {
+    display: none;
+}
+
+.banner-upload-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    pointer-events: none;
+}
+
+.banner-upload-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.banner-upload-sub {
+    font-size: 0.83rem;
+    color: var(--muted);
+}
+
+/* Profile photo row inside card */
+
+.create-profile-photo-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.create-profile-avatar-wrap {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--line);
+    background: var(--surface-strong);
+    flex-shrink: 0;
+}
+
+.create-profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.create-profile-photo-label {
+    margin: 0;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.create-profile-photo-sub {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--muted);
+}
+
+/* Form fields */
+
+.create-location-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.create-location-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.create-location-field label {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.create-location-field input,
+.create-location-field textarea,
+.create-location-field select {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border-radius: 0.95rem;
+    border: 1px solid rgba(29, 49, 39, 0.18);
+    background: #fff;
+    font: inherit;
+    color: var(--text);
+    resize: vertical;
+}
+
+.create-location-field input:focus,
+.create-location-field textarea:focus,
+.create-location-field select:focus {
+    outline: 2px solid rgba(53, 98, 74, 0.18);
+    border-color: var(--accent);
+}
+
+.create-location-field textarea {
+    min-height: 6rem;
+}
+
+.create-location-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.create-location-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+}
+
+.create-location-cancel {
+    width: auto;
+    margin-top: 0;
+    padding: 0 1.5rem;
+    min-height: 3rem;
+    font-size: 0.95rem;
+}
+
+.create-location-submit {
+    width: auto;
+    margin-top: 0;
+    padding: 0 2rem;
+    min-height: 3rem;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 900px) {
+    .create-location-main {
+        grid-template-columns: 1fr;
+    }
+
+    .create-location-fields-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 900px) {
+    .profile-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-card {
+        padding: 1.5rem;
+    }
+
+    .profile-avatar-wrap {
+        width: 5.5rem;
+        height: 5.5rem;
+    }
+    .login-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .login-hero,
+    .login-panel {
+        padding: 2rem 1.4rem;
+    }
+
+    .login-hero {
+        padding-bottom: 0;
+    }
+
+    .login-card {
+        padding: 1.6rem;
+    }
+
+    .app-page {
+        padding: 1rem;
+    }
+
+    .app-shell {
+        min-height: calc(100vh - 2rem);
+    }
+
+    .app-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    #map {
+        height: calc(100vh - 16rem);
+        min-height: 24rem;
+    }
 }
