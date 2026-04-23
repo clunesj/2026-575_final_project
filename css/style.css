@@ -2,3 +2,56 @@
 #map {
     height: 98.416vh; /* Height of the map ~98.5% of the client window, takes up most of the client window without causing a scroll bar */
 }
+
+.timefilter-container, .repeatfilter-container { /* Styling for the time and frequency filter containers */
+    background: rgb(217, 234, 211);
+    padding: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
+
+.timefilter-content, .repeatfilter-content { /* Styling for the time and frequency filter content */
+        font-size: 16px;
+        padding: 10px; /* Ensures each option has a margin from the edges of the container. */
+        display: block;
+}
+
+/* Default styling of the navmenu, when the menu is closed.*/
+.navmenu-container {
+    background: rgb(217, 234, 211);
+    padding: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    overflow: hidden; /* Options are also part of the container. This combined with max-width/height hides the options until the menu is expanded. */
+    transition: all 0.3s; /* Any changes in width/height of navmenu-container will take ~0.3 seconds */
+    max-width: 40px; /* Establishes the base width of the navmenu, used to make the transition work */
+    max-height: 40px; /* Likewise, but for height. */
+}
+
+/* Styling of the navmenu when it is opened. */
+.navmenu-container.expanded {
+    max-width: 200px; /* Establishes the maximum width of the basemap, used as an upper bound for the transition. */
+    max-height: 400px; /* Likewise, but for height. */
+}
+
+/* Default appearance of navmenu-content. The navmenu starts closed, so the content should not be drawn until it is expanded.*/
+.navmenu-content {
+    display: none; /* Ensures that navmenu-content is not drawn until the navmeny is expanded. */
+    padding: 10px; /* Ensures each option has a margin from the edges of the container. */
+}
+
+/* Shows navmenu-content only when navmenu-container is expanded. */
+.navmenu-container.expanded .navmenu-content {
+    display: block; /* Makes each option evenly spaced in the container */
+    font-size: 16px
+}
+
+.navmenu-button {
+    cursor: pointer; /* Feedback to indicate that the menu can be clicked */
+    border: none; /* Hides the default border around the menu svg */
+    background: none; /* Background is already handled in navmenu-container.*/
+    /* The next five lines ensure the menu svg is centered in navmenu-container. */
+    width: 100%; /* The button fills the closed container. */
+    height: 100%;
+    display: flex; /* Used in combination with align-items and justify-content to center the button in both states of the menu. */
+    align-items: center;
+    justify-content: center;
+}
