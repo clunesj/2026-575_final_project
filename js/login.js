@@ -9,7 +9,7 @@
             sessionStorage.removeItem('commonGoodUserEmail');
         }
 
-        window.location.href = 'home.html';
+        window.location.href = 'index.html';
     }
 
     function bindLoginFlow() {
