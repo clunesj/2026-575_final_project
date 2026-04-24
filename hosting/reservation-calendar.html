@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>CommonGood | Reservation Calendar</title>
+        <link rel="stylesheet" href="../css/style.css?v=8">
+    </head>
+
+    <body class="hosting-dashboard-page">
+        <div class="hosting-dashboard-layout">
+            <aside class="hosting-dashboard-sidebar" aria-label="Hosting navigation">
+                <h2 class="hosting-dashboard-brand">HOSTING:</h2>
+                <nav class="hosting-dashboard-nav">
+                    <a class="hosting-dashboard-nav-item" href="host-dashboard.html">Dashboard</a>
+                    <a class="hosting-dashboard-nav-item" href="add.html?mode=edit">Your Locations</a>
+                    <a class="hosting-dashboard-nav-item is-active" href="reservation-calendar.html" aria-current="page">Reservation Calendar</a>
+                    <a class="hosting-dashboard-nav-item" href="your-events.html">Your Events</a>
+                </nav>
+            </aside>
+
+            <main class="hosting-dashboard-main">
+                <header class="reservation-header">
+                    <h1 id="reservation-calendar-title">Reservation Calendar</h1>
+                    <div class="reservation-header-actions">
+                        <button class="hosting-dashboard-btn" id="set-location-hours-btn" type="button">Set Location Hours</button>
+                        <button class="hosting-dashboard-btn" id="new-booking-btn" type="button">New Booking</button>
+                        <a class="hosting-back-map-btn" href="../index.html">Back to Map</a>
+                    </div>
+                </header>
+
+                <section class="reservation-shell" aria-label="Weekly reservation calendar">
+                    <p class="reservation-hours-summary" id="reservation-hours-summary">Current Location Hours:</p>
+
+                    <div class="reservation-week-toolbar">
+                        <button class="reservation-week-nav" id="prev-week-btn" type="button" aria-label="Previous week">&#10094;</button>
+                        <h2 id="reservation-week-range">Week</h2>
+                        <button class="reservation-week-nav" id="next-week-btn" type="button" aria-label="Next week">&#10095;</button>
+                    </div>
+
+                    <div class="reservation-grid-scroller">
+                        <div id="reservation-week-grid" class="reservation-week-grid"></div>
+                    </div>
+                </section>
+
+                <section class="hosting-panel reservation-manage-panel" aria-label="Manage scheduled items">
+                    <h2>Manage Schedule</h2>
+                    <div id="reservation-items-list" class="reservation-items-list">
+                        <p class="hosting-panel-empty">No bookings, events, or breaks scheduled yet.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div class="hosting-modal-backdrop" id="hours-modal-backdrop" hidden>
+            <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="hours-modal-title">
+                <button class="hosting-modal-close" id="close-hours-modal" type="button" aria-label="Close modal">x</button>
+                <h2 id="hours-modal-title">Set Location Hours</h2>
+
+                <label for="hours-day-select">Day</label>
+                <select id="hours-day-select">
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                </select>
+
+                <label for="hours-start-input">Open Hour</label>
+                <input id="hours-start-input" type="time" value="08:00" step="3600">
+
+                <label for="hours-end-input">Close Hour</label>
+                <input id="hours-end-input" type="time" value="13:00" step="3600">
+
+                <label class="reservation-checkbox-label" for="hours-closed-checkbox">
+                    <input id="hours-closed-checkbox" type="checkbox">
+                    Closed all day
+                </label>
+
+                <div class="reservation-modal-actions">
+                    <button class="hosting-dashboard-btn" id="apply-weekday-template-btn" type="button">Apply Current Hours to Mon-Sat</button>
+                    <button class="hosting-dashboard-btn" id="save-hours-btn" type="button">Save Day Hours</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hosting-modal-backdrop" id="booking-modal-backdrop" hidden>
+            <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+                <button class="hosting-modal-close" id="close-booking-modal" type="button" aria-label="Close modal">x</button>
+                <h2 id="booking-modal-title">Add New Booking</h2>
+
+                <label for="booking-title-input">Booking Name</label>
+                <input id="booking-title-input" type="text" placeholder="3D Printer - Guest Name">
+
+                <label for="booking-date-input">Date</label>
+                <input id="booking-date-input" type="date">
+
+                <label for="booking-start-input">Start Time</label>
+                <input id="booking-start-input" type="time" step="3600" value="09:00">
+
+                <label for="booking-end-input">End Time</label>
+                <input id="booking-end-input" type="time" step="3600" value="11:00">
+
+                <button class="hosting-dashboard-btn" id="save-booking-btn" type="button">Save Booking</button>
+            </div>
+        </div>
+
+        <div class="hosting-modal-backdrop" id="edit-schedule-item-backdrop" hidden>
+            <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="edit-schedule-item-title">
+                <button class="hosting-modal-close" id="close-edit-schedule-item" type="button" aria-label="Close modal">x</button>
+                <h2 id="edit-schedule-item-title">Edit Scheduled Item</h2>
+
+                <p class="reservation-edit-type" id="edit-schedule-item-kind">Booking</p>
+
+                <div id="edit-title-wrap">
+                    <label for="edit-item-title-input">Title</label>
+                    <input id="edit-item-title-input" type="text">
+                </div>
+
+                <div id="edit-date-wrap">
+                    <label for="edit-item-date-input">Date</label>
+                    <input id="edit-item-date-input" type="date">
+                </div>
+
+                <div id="edit-weekdays-wrap" hidden>
+                    <label>Select Days</label>
+                    <div class="hosting-modal-days" id="edit-break-days" aria-label="Edit break days">
+                        <button class="hosting-day-btn" type="button" data-day="1">Mon</button>
+                        <button class="hosting-day-btn" type="button" data-day="2">Tue</button>
+                        <button class="hosting-day-btn" type="button" data-day="3">Wed</button>
+                        <button class="hosting-day-btn" type="button" data-day="4">Thu</button>
+                        <button class="hosting-day-btn" type="button" data-day="5">Fri</button>
+                        <button class="hosting-day-btn" type="button" data-day="6">Sat</button>
+                        <button class="hosting-day-btn" type="button" data-day="0">Sun</button>
+                    </div>
+                </div>
+
+                <label for="edit-item-start-input">Start Time</label>
+                <input id="edit-item-start-input" type="time" step="3600">
+
+                <label for="edit-item-end-input">End Time</label>
+                <input id="edit-item-end-input" type="time" step="3600">
+
+                <div id="edit-notes-wrap">
+                    <label for="edit-item-notes-input">Notes</label>
+                    <textarea id="edit-item-notes-input" rows="3"></textarea>
+                </div>
+
+                <div class="reservation-edit-actions">
+                    <button class="hosting-dashboard-btn" id="save-edit-schedule-item" type="button">Save Changes</button>
+                    <button class="hosting-dashboard-btn reservation-delete-btn" id="delete-schedule-item" type="button">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="../js/reservation-calendar.js?v=4"></script>
+    </body>
+</html>

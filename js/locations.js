@@ -4,10 +4,37 @@
         mode: 'commonGoodAccessMode',
         email: 'commonGoodUserEmail',
         profileName: 'commonGoodProfileName',
-        profilePhoto: 'commonGoodProfilePhoto'
+        profilePhoto: 'commonGoodProfilePhoto',
+        createdLocation: 'commonGoodHasCreatedLocation',
+        createdLocations: 'commonGoodCreatedLocations',
+        locationName: 'commonGoodLocationName',
+        locationAddress: 'commonGoodLocationAddress'
     };
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
+
+    function ensureGuestSeedLocation() {
+        if (accessMode !== 'guest') { return; }
+
+        var storedLocations = [];
+        try {
+            storedLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
+        } catch (error) {
+            storedLocations = [];
+        }
+
+        if (Array.isArray(storedLocations) && storedLocations.length > 0) { return; }
+
+        var seedLocation = {
+            name: 'Test Location',
+            address: '777 University Ave, Madison, WI'
+        };
+
+        sessionStorage.setItem(KEYS.createdLocation, 'true');
+        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
+        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
+        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
+    }
 
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
@@ -15,7 +42,7 @@
 
         if (accessMode === 'guest' && navType === 'reload') {
             sessionStorage.clear();
-            window.location.href = 'index.html';
+            window.location.href = '/index.html';
             return true;
         }
 
@@ -24,7 +51,7 @@
 
     function enforceAccess() {
         if (!accessMode) {
-            window.location.href = 'index.html';
+            window.location.href = '/index.html';
         }
     }
 
@@ -55,6 +82,74 @@
         }
     }
 
+    function renderCreatedLocations() {
+        var listEl = document.getElementById('created-locations-list');
+        var emptyEl = document.getElementById('created-locations-empty');
+
+        if (!listEl || !emptyEl) { return; }
+
+        var createdLocations = [];
+        try {
+            createdLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
+        } catch (error) {
+            createdLocations = [];
+        }
+
+        listEl.innerHTML = '';
+
+        if (!createdLocations.length) {
+            emptyEl.hidden = false;
+            return;
+        }
+
+        emptyEl.hidden = true;
+
+        createdLocations.forEach(function (locationEntry) {
+            var locationObj = (typeof locationEntry === 'string')
+                ? { name: locationEntry, address: '' }
+                : locationEntry;
+
+            var li = document.createElement('li');
+            li.className = 'locations-created-item';
+
+            var nameLine = document.createElement('span');
+            nameLine.className = 'locations-created-name';
+            nameLine.textContent = locationObj.address
+                ? (locationObj.name + ' - ' + locationObj.address)
+                : locationObj.name;
+
+            var actions = document.createElement('div');
+            actions.className = 'locations-created-actions';
+
+            var dashboardLink = document.createElement('a');
+            dashboardLink.className = 'locations-created-action';
+            dashboardLink.href = '/hosting/host-dashboard.html';
+            dashboardLink.textContent = 'Dashboard';
+            dashboardLink.addEventListener('click', function () {
+                sessionStorage.setItem(KEYS.createdLocation, 'true');
+                sessionStorage.setItem(KEYS.locationName, locationObj.name);
+                sessionStorage.setItem(KEYS.locationAddress, locationObj.address || '');
+            });
+
+            var editLink = document.createElement('a');
+            editLink.className = 'locations-created-action';
+            editLink.href = '/hosting/add.html?mode=edit';
+            editLink.textContent = 'Edit Details';
+            editLink.addEventListener('click', function () {
+                sessionStorage.setItem(KEYS.createdLocation, 'true');
+                sessionStorage.setItem(KEYS.locationName, locationObj.name);
+                sessionStorage.setItem(KEYS.locationAddress, locationObj.address || '');
+            });
+
+            actions.appendChild(dashboardLink);
+            actions.appendChild(editLink);
+
+            li.appendChild(nameLine);
+            li.appendChild(actions);
+            listEl.appendChild(li);
+        });
+    }
+
     function bindLogout() {
         var logoutLink = document.getElementById('logout-link');
         if (!logoutLink) { return; }
@@ -66,11 +161,14 @@
     }
 
     function init() {
+        ensureGuestSeedLocation();
         if (resetGuestSessionOnReload()) { return; }
 
         enforceAccess();
+
         updateSessionBadge();
         loadSidebarProfile();
+        renderCreatedLocations();
         bindLogout();
     }
 

@@ -5,8 +5,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width">
         <title>CommonGood | Location Page Creation</title>
-        <link rel="stylesheet" href="css/style.css?v=4">
-        <link rel="stylesheet" href="lib/dist/leaflet.css?v=4">
+        <link rel="stylesheet" href="../css/style.css?v=7">
+        <link rel="stylesheet" href="../lib/dist/leaflet.css?v=7">
     </head>
 
     <body class="hosting-create-page">
@@ -14,10 +14,10 @@
             <aside class="hosting-create-sidebar" aria-label="Hosting navigation">
                 <h2 class="hosting-create-brand">HOSTING:</h2>
                 <nav class="hosting-create-nav">
-                    <a class="hosting-create-nav-item" href="#">Dashboard</a>
-                    <a class="hosting-create-nav-item is-active" href="#" aria-current="page">Your Locations</a>
-                    <a class="hosting-create-nav-item" href="#">Reservation Calendar</a>
-                    <a class="hosting-create-nav-item" href="#">Your Events</a>
+                    <a class="hosting-create-nav-item" href="host-dashboard.html">Dashboard</a>
+                    <a class="hosting-create-nav-item is-active" href="add.html?mode=edit" aria-current="page">Your Locations</a>
+                    <a class="hosting-create-nav-item" href="reservation-calendar.html">Reservation Calendar</a>
+                    <a class="hosting-create-nav-item" href="your-events.html">Your Events</a>
                 </nav>
             </aside>
 
@@ -66,24 +66,68 @@
                             <input id="banner-input" type="file" accept="image/*" hidden aria-label="Choose banner photo">
                         </div>
                         <div class="hosting-meta-row">
-                            <span>Page Description</span>
-                            <button class="hosting-upload-btn hosting-upload-btn--ghost" id="edit-description-btn" type="button">Edit</button>
-                        </div>
-                        <div class="hosting-meta-row">
                             <span>Profile Photo</span>
                             <button class="hosting-upload-btn" id="profile-photo-upload-btn" type="button">Upload</button>
                             <input id="profile-photo-input" type="file" accept="image/*" hidden aria-label="Choose profile photo">
                         </div>
 
-                        <div class="hosting-links-list">
-                            <a href="#" aria-disabled="true">Social Media & Messaging Links</a>
-                            <a href="#" aria-disabled="true">Location QR Code</a>
-                            <a href="#" aria-disabled="true">Map Display Icons</a>
-                            <a href="#" aria-disabled="true">Public Contact Info</a>
+                        <div class="hosting-links-list" aria-label="Listing tool sections">
+                            <button class="hosting-tool-toggle" type="button" data-target="tool-description">Page Description</button>
+                            <div class="hosting-tool-panel" id="tool-description" hidden>
+                                <label for="location-page-description">Describe your location page</label>
+                                <textarea id="location-page-description" rows="3" placeholder="Tell visitors what this location offers, who it helps, and what to expect."></textarea>
+                                <button class="hosting-upload-btn" id="save-description-btn" type="button">Save Description</button>
+                                <p class="hosting-tool-preview" id="description-preview">No description saved yet.</p>
+                            </div>
+
+                            <button class="hosting-tool-toggle" type="button" data-target="tool-social">Social Media & Messaging Links</button>
+                            <div class="hosting-tool-panel" id="tool-social" hidden>
+                                <div class="hosting-inline-tool-row">
+                                    <select id="social-platform-select" aria-label="Social platform">
+                                        <option value="Instagram">Instagram</option>
+                                        <option value="Discord">Discord</option>
+                                        <option value="Facebook">Facebook</option>
+                                        <option value="WhatsApp">WhatsApp</option>
+                                        <option value="X">X</option>
+                                        <option value="TikTok">TikTok</option>
+                                        <option value="YouTube">YouTube</option>
+                                        <option value="Website">Website</option>
+                                    </select>
+                                    <input id="social-url-input" type="url" placeholder="https://...">
+                                </div>
+                                <button class="hosting-upload-btn" id="add-social-link-btn" type="button">Add Link</button>
+                                <ul class="hosting-tool-list" id="social-links-list"></ul>
+                            </div>
+
+                            <button class="hosting-tool-toggle" type="button" data-target="tool-qr">Location QR Code</button>
+                            <div class="hosting-tool-panel" id="tool-qr" hidden>
+                                <input id="location-site-url" type="url" placeholder="https://your-location-site.example">
+                                <button class="hosting-upload-btn" id="generate-qr-btn" type="button">Generate QR</button>
+                                <div class="hosting-qr-output" id="qr-output-wrap" hidden>
+                                    <img id="location-qr-image" alt="Generated location QR code">
+                                </div>
+                            </div>
+
+                            <button class="hosting-tool-toggle" type="button" data-target="tool-icons">Map Display Icons (Coming soon)</button>
+
+                            <button class="hosting-tool-toggle" type="button" data-target="tool-contact">Public Contact Info</button>
+                            <div class="hosting-tool-panel" id="tool-contact" hidden>
+                                <input id="public-contact-email" type="email" placeholder="Public email (optional)">
+                                <input id="public-contact-phone" type="tel" placeholder="Public phone (optional)">
+                                <select id="contact-preference" aria-label="Preferred contact method">
+                                    <option value="No preference">No preference</option>
+                                    <option value="Email preferred">Email preferred</option>
+                                    <option value="Phone preferred">Phone preferred</option>
+                                    <option value="DM preferred">Social DM preferred</option>
+                                </select>
+                                <textarea id="contact-notes" rows="2" placeholder="Contact preference notes (optional)"></textarea>
+                                <button class="hosting-upload-btn" id="save-contact-btn" type="button">Save Contact Info</button>
+                                <p class="hosting-tool-preview" id="contact-preview">No public contact info saved yet.</p>
+                            </div>
                         </div>
 
                         <div class="hosting-host-preview">
-                            <img id="listing-avatar" class="hosting-host-avatar" src="img/avatar-placeholder.svg" alt="Hosting profile photo preview">
+                            <img id="listing-avatar" class="hosting-host-avatar" src="../img/avatar-placeholder.svg" alt="Hosting profile photo preview">
                             <p id="listing-name"></p>
                         </div>
                     </article>
@@ -104,14 +148,14 @@
                         </div>
 
                         <form id="create-location-form" class="hosting-submit-row" novalidate>
-                            <button class="hosting-create-action-btn" type="submit">Save Listing Draft</button>
+                            <button class="hosting-create-action-btn" type="submit">Save Location</button>
                         </form>
                     </article>
                 </section>
             </main>
         </div>
 
-        <script src="lib/dist/leaflet.js?v=4"></script>
-        <script type="text/javascript" src="js/add.js?v=4"></script>
+        <script src="../lib/dist/leaflet.js?v=7"></script>
+        <script type="text/javascript" src="../js/add.js?v=7"></script>
     </body>
 </html>

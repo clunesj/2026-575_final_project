@@ -1,7 +1,27 @@
 // login.js, by Joseph Kowalczyk, James Clunes, and Brooke Fandrich
 (function() {
+    var KEYS = {
+        mode: 'commonGoodAccessMode',
+        locationName: 'commonGoodLocationName',
+        locationAddress: 'commonGoodLocationAddress',
+        createdLocation: 'commonGoodHasCreatedLocation',
+        createdLocations: 'commonGoodCreatedLocations'
+    };
+
+    function seedGuestTestLocation() {
+        var seedLocation = {
+            name: 'Test Location',
+            address: '777 University Ave, Madison, WI'
+        };
+
+        sessionStorage.setItem(KEYS.createdLocation, 'true');
+        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
+        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
+        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
+    }
+
     function continueToMap(mode, emailValue) {
-        sessionStorage.setItem('commonGoodAccessMode', mode);
+        sessionStorage.setItem(KEYS.mode, mode);
 
         if (emailValue) {
             sessionStorage.setItem('commonGoodUserEmail', emailValue);
@@ -28,6 +48,7 @@
 
         guestButton.addEventListener('click', function() {
             sessionStorage.clear();
+            seedGuestTestLocation();
             continueToMap('guest');
         });
     }

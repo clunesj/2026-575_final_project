@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>CommonGood | Hosting Dashboard</title>
+        <link rel="stylesheet" href="../css/style.css?v=8">
+    </head>
+
+    <body class="hosting-dashboard-page">
+        <div class="hosting-dashboard-layout">
+            <aside class="hosting-dashboard-sidebar" aria-label="Hosting navigation">
+                <h2 class="hosting-dashboard-brand">HOSTING:</h2>
+                <nav class="hosting-dashboard-nav">
+                    <a class="hosting-dashboard-nav-item is-active" href="host-dashboard.html" aria-current="page">Dashboard</a>
+                    <a class="hosting-dashboard-nav-item" href="add.html?mode=edit">Your Locations</a>
+                    <a class="hosting-dashboard-nav-item" href="reservation-calendar.html">Reservation Calendar</a>
+                    <a class="hosting-dashboard-nav-item" href="your-events.html">Your Events</a>
+                </nav>
+            </aside>
+
+            <main class="hosting-dashboard-main">
+                <header class="hosting-dashboard-header">
+                    <h1 id="hosting-dashboard-title">Your Location Dashboard</h1>
+                    <a class="hosting-back-map-btn" href="../index.html">Back to Map</a>
+                </header>
+
+                <section class="hosting-dashboard-stats" aria-label="Location status cards">
+                    <article class="hosting-stat-card">
+                        <p class="hosting-stat-value">0</p>
+                        <p class="hosting-stat-label">Active Bookings</p>
+                    </article>
+                    <article class="hosting-stat-card">
+                        <p class="hosting-stat-value">0</p>
+                        <p class="hosting-stat-label">Total Guests All-Time</p>
+                    </article>
+                    <article class="hosting-stat-card">
+                        <p class="hosting-stat-value">0</p>
+                        <p class="hosting-stat-label">Events Scheduled</p>
+                    </article>
+                    <article class="hosting-stat-card">
+                        <p class="hosting-stat-value">0</p>
+                        <p class="hosting-stat-label">Guests At Location</p>
+                    </article>
+                </section>
+
+                <section class="hosting-dashboard-panels" aria-label="Dashboard controls and updates">
+                    <article class="hosting-panel hosting-panel-actions">
+                        <div class="hosting-panel-actions-row">
+                            <a class="hosting-dashboard-btn hosting-dashboard-btn-link" href="your-events.html">Create an Event</a>
+                            <button class="hosting-dashboard-btn" id="open-break-modal" type="button">Schedule Break</button>
+                        </div>
+                        <a class="hosting-dashboard-btn hosting-dashboard-btn-link hosting-dashboard-btn-wide" href="add.html?mode=edit">Location Settings</a>
+                    </article>
+
+                    <article class="hosting-panel hosting-panel-notifications">
+                        <h2>Recent Notifications</h2>
+                        <p class="hosting-panel-empty">No notifications yet.</p>
+                    </article>
+                </section>
+
+                <section class="hosting-panel hosting-panel-busyness" aria-label="Busyness chart preview">
+                    <h2>Popular Times</h2>
+                    <div class="hosting-busyness-empty">
+                        <p>No visitors yet</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div class="hosting-modal-backdrop" id="event-modal-backdrop" hidden>
+            <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="event-modal-title">
+                <button class="hosting-modal-close" id="close-event-modal" type="button" aria-label="Close modal">x</button>
+                <h2 id="event-modal-title">Schedule a Break</h2>
+
+                <label> Select Days </label>
+                <div class="hosting-modal-days" aria-label="Select days">
+                    <button class="hosting-day-btn" type="button" data-day="1">Mon</button>
+                    <button class="hosting-day-btn" type="button" data-day="2">Tue</button>
+                    <button class="hosting-day-btn" type="button" data-day="3">Wed</button>
+                    <button class="hosting-day-btn" type="button" data-day="4">Thu</button>
+                    <button class="hosting-day-btn" type="button" data-day="5">Fri</button>
+                    <button class="hosting-day-btn" type="button" data-day="6">Sat</button>
+                    <button class="hosting-day-btn" type="button" data-day="0">Sun</button>
+                </div>
+
+                <label> Time Range </label>
+                <div class="hosting-modal-time-row">
+                    <input id="break-start-time" type="time" value="09:00" step="3600" aria-label="Start time">
+                    <span>-</span>
+                    <input id="break-end-time" type="time" value="17:00" step="3600" aria-label="End time">
+                </div>
+
+                <label for="break-week-date">Week (pick any date in that week)</label>
+                <input id="break-week-date" type="date" aria-label="Week date for this break">
+
+                <label for="break-reason-input">Reason for Break (Optional)</label>
+                <textarea id="break-reason-input" rows="3" placeholder="Maintenance, staff meeting, etc."></textarea>
+
+                <button class="hosting-dashboard-btn hosting-modal-confirm" id="confirm-event-modal" type="button">Confirm Schedule</button>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="../js/host-dashboard.js?v=3"></script>
+    </body>
+</html>

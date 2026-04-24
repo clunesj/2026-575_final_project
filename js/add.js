@@ -4,8 +4,22 @@
         mode: 'commonGoodAccessMode',
         email: 'commonGoodUserEmail',
         profileName: 'commonGoodProfileName',
-        profilePhoto: 'commonGoodProfilePhoto'
+        profilePhoto: 'commonGoodProfilePhoto',
+        locationName: 'commonGoodLocationName',
+        locationAddress: 'commonGoodLocationAddress',
+        createdLocation: 'commonGoodHasCreatedLocation',
+        createdLocations: 'commonGoodCreatedLocations',
+        locationDescription: 'commonGoodLocationDescription',
+        socialLinks: 'commonGoodLocationSocialLinks',
+        locationSiteUrl: 'commonGoodLocationSiteUrl',
+        publicContactInfo: 'commonGoodPublicContactInfo',
+        locationServices: 'commonGoodLocationServices',
+        hostMaterials: 'commonGoodHostMaterials',
+        guestMaterials: 'commonGoodGuestMaterials'
     };
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var isEditMode = urlParams.get('mode') === 'edit';
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
     var locationPreviewMap;
@@ -41,6 +55,50 @@
         'Cross Plains, WI',
         'Mount Horeb, WI'
     ];
+
+    function parseJsonFromSession(key, fallback) {
+        try {
+            var value = sessionStorage.getItem(key);
+            if (!value) { return fallback; }
+            return JSON.parse(value);
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function setEditorModeLabels() {
+        if (!isEditMode) { return; }
+
+        var titleEl = document.title;
+        if (titleEl) {
+            document.title = 'CommonGood | Edit Location';
+        }
+
+        var topHeading = document.querySelector('.hosting-create-topbar h1');
+        if (topHeading) {
+            topHeading.textContent = 'Edit Location Details';
+        }
+
+        var submitButton = document.querySelector('#create-location-form button[type="submit"]');
+        if (submitButton) {
+            submitButton.textContent = 'Save Location Changes';
+        }
+    }
+
+    function prefillCoreLocationInputs() {
+        var locNameInput = document.getElementById('loc-name');
+        var mapQueryInput = document.getElementById('location-query');
+        var savedLocationName = sessionStorage.getItem(KEYS.locationName);
+        var savedLocationAddress = sessionStorage.getItem(KEYS.locationAddress);
+
+        if (locNameInput && savedLocationName) {
+            locNameInput.value = savedLocationName;
+        }
+
+        if (mapQueryInput && savedLocationAddress) {
+            mapQueryInput.value = savedLocationAddress;
+        }
+    }
 
     function toWisconsinQuery(text) {
         if (/\b(wi|wisconsin)\b/i.test(text)) {
@@ -136,7 +194,7 @@
 
         if (accessMode === 'guest' && navType === 'reload') {
             sessionStorage.clear();
-            window.location.href = 'index.html';
+            window.location.href = '/index.html';
             return true;
         }
 
@@ -145,7 +203,7 @@
 
     function enforceAccess() {
         if (!accessMode) {
-            window.location.href = 'index.html';
+            window.location.href = '/index.html';
         }
     }
 
@@ -454,20 +512,22 @@
 
         if (!addButton || !nameInput || !detailsInput || !imageInput || !servicesList) { return; }
 
-        function appendService(imageSrc) {
-            var name = nameInput.value.trim();
-            var details = detailsInput.value.trim();
+        var services = parseJsonFromSession(KEYS.locationServices, []);
 
-            if (!name) {
-                alert('Please enter a service name before adding.');
-                return;
-            }
+        function saveServices() {
+            sessionStorage.setItem(KEYS.locationServices, JSON.stringify(services));
+        }
+
+        function appendServiceCard(service) {
+            var name = service && service.name ? service.name : '';
+            var details = service && service.details ? service.details : '';
+            var imageSrc = service && service.imageSrc ? service.imageSrc : '';
 
             var li = document.createElement('li');
             li.className = 'hosting-service-item';
 
             var img = document.createElement('img');
-            img.src = imageSrc || 'img/add-map-placeholder.svg';
+            img.src = imageSrc || '../img/add-map-placeholder.svg';
             img.alt = 'Service preview image';
 
             var wrapper = document.createElement('div');
@@ -485,11 +545,34 @@
             li.appendChild(img);
             li.appendChild(wrapper);
             servicesList.appendChild(li);
+        }
+
+        function appendService(imageSrc) {
+            var name = nameInput.value.trim();
+            var details = detailsInput.value.trim();
+
+            if (!name) {
+                alert('Please enter a service name before adding.');
+                return;
+            }
+
+            var service = {
+                name: name,
+                details: details,
+                imageSrc: imageSrc || ''
+            };
+
+            services.push(service);
+            saveServices();
+            appendServiceCard(service);
 
             nameInput.value = '';
             detailsInput.value = '';
             imageInput.value = '';
         }
+
+        servicesList.innerHTML = '';
+        services.forEach(appendServiceCard);
 
         addButton.addEventListener('click', function () {
             var file = imageInput.files[0];
@@ -515,36 +598,302 @@
 
         if (!addHost || !addGuest || !hostList || !guestList) { return; }
 
-        function addToList(targetList, promptLabel) {
+        var hostMaterials = parseJsonFromSession(KEYS.hostMaterials, []);
+        var guestMaterials = parseJsonFromSession(KEYS.guestMaterials, []);
+
+        function renderList(targetList, items) {
+            targetList.innerHTML = '';
+
+            items.forEach(function (item) {
+                var li = document.createElement('li');
+                li.textContent = item;
+                targetList.appendChild(li);
+            });
+        }
+
+        function saveMaterials() {
+            sessionStorage.setItem(KEYS.hostMaterials, JSON.stringify(hostMaterials));
+            sessionStorage.setItem(KEYS.guestMaterials, JSON.stringify(guestMaterials));
+        }
+
+        function addToList(targetList, promptLabel, targetStore) {
             var value = window.prompt(promptLabel);
             if (!value) { return; }
 
             var text = value.trim();
             if (!text) { return; }
 
-            var li = document.createElement('li');
-            li.textContent = text;
-            targetList.appendChild(li);
+            targetStore.push(text);
+            saveMaterials();
+            renderList(targetList, targetStore);
         }
 
+        renderList(hostList, hostMaterials);
+        renderList(guestList, guestMaterials);
+
         addHost.addEventListener('click', function () {
-            addToList(hostList, 'Add a host-provided material:');
+            addToList(hostList, 'Add a host-provided material:', hostMaterials);
         });
 
         addGuest.addEventListener('click', function () {
-            addToList(guestList, 'Add a guest-brought material:');
+            addToList(guestList, 'Add a guest-brought material:', guestMaterials);
         });
+    }
+
+    function bindListingTools() {
+        var toggles = document.querySelectorAll('.hosting-tool-toggle[data-target]');
+        var descriptionInput = document.getElementById('location-page-description');
+        var descriptionPreview = document.getElementById('description-preview');
+        var saveDescriptionBtn = document.getElementById('save-description-btn');
+
+        var socialPlatformSelect = document.getElementById('social-platform-select');
+        var socialUrlInput = document.getElementById('social-url-input');
+        var addSocialBtn = document.getElementById('add-social-link-btn');
+        var socialLinksListEl = document.getElementById('social-links-list');
+
+        var locationSiteUrl = document.getElementById('location-site-url');
+        var generateQrBtn = document.getElementById('generate-qr-btn');
+        var qrWrap = document.getElementById('qr-output-wrap');
+        var qrImage = document.getElementById('location-qr-image');
+
+        var contactEmail = document.getElementById('public-contact-email');
+        var contactPhone = document.getElementById('public-contact-phone');
+        var contactPreference = document.getElementById('contact-preference');
+        var contactNotes = document.getElementById('contact-notes');
+        var saveContactBtn = document.getElementById('save-contact-btn');
+        var contactPreview = document.getElementById('contact-preview');
+
+        if (toggles.length) {
+            toggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    var targetId = toggle.getAttribute('data-target');
+                    if (!targetId) { return; }
+
+                    var targetPanel = document.getElementById(targetId);
+                    if (!targetPanel) { return; }
+
+                    targetPanel.hidden = !targetPanel.hidden;
+                });
+            });
+        }
+
+        if (descriptionInput && descriptionPreview && saveDescriptionBtn) {
+            var savedDescription = sessionStorage.getItem(KEYS.locationDescription);
+            if (savedDescription) {
+                descriptionInput.value = savedDescription;
+                descriptionPreview.textContent = savedDescription;
+            }
+
+            saveDescriptionBtn.addEventListener('click', function () {
+                var value = descriptionInput.value.trim();
+                if (!value) {
+                    descriptionPreview.textContent = 'No description saved yet.';
+                    sessionStorage.removeItem(KEYS.locationDescription);
+                    return;
+                }
+
+                sessionStorage.setItem(KEYS.locationDescription, value);
+                descriptionPreview.textContent = value;
+            });
+        }
+
+        function renderSocialLinks(links) {
+            if (!socialLinksListEl) { return; }
+            socialLinksListEl.innerHTML = '';
+
+            links.forEach(function (item) {
+                var li = document.createElement('li');
+                var anchor = document.createElement('a');
+                anchor.href = item.url;
+                anchor.target = '_blank';
+                anchor.rel = 'noopener noreferrer';
+                anchor.textContent = item.platform + ': ' + item.url;
+                li.appendChild(anchor);
+                socialLinksListEl.appendChild(li);
+            });
+        }
+
+        var savedSocialLinks = [];
+        try {
+            savedSocialLinks = JSON.parse(sessionStorage.getItem(KEYS.socialLinks) || '[]');
+        } catch (error) {
+            savedSocialLinks = [];
+        }
+        renderSocialLinks(savedSocialLinks);
+
+        if (socialPlatformSelect && socialUrlInput && addSocialBtn) {
+            addSocialBtn.addEventListener('click', function () {
+                var platform = socialPlatformSelect.value;
+                var url = socialUrlInput.value.trim();
+
+                if (!url) {
+                    alert('Please enter a link URL.');
+                    return;
+                }
+
+                var normalizedUrl = /^https?:\/\//i.test(url) ? url : ('https://' + url);
+                savedSocialLinks.push({ platform: platform, url: normalizedUrl });
+                sessionStorage.setItem(KEYS.socialLinks, JSON.stringify(savedSocialLinks));
+                renderSocialLinks(savedSocialLinks);
+                socialUrlInput.value = '';
+            });
+        }
+
+        if (locationSiteUrl && qrWrap && qrImage && generateQrBtn) {
+            var savedSiteUrl = sessionStorage.getItem(KEYS.locationSiteUrl);
+            if (savedSiteUrl) {
+                locationSiteUrl.value = savedSiteUrl;
+                qrImage.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(savedSiteUrl);
+                qrWrap.hidden = false;
+            }
+
+            generateQrBtn.addEventListener('click', function () {
+                var rawUrl = locationSiteUrl.value.trim();
+                if (!rawUrl) {
+                    alert('Enter a website URL first.');
+                    return;
+                }
+
+                var normalizedUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : ('https://' + rawUrl);
+                sessionStorage.setItem(KEYS.locationSiteUrl, normalizedUrl);
+                qrImage.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(normalizedUrl);
+                qrWrap.hidden = false;
+            });
+        }
+
+        if (contactEmail && contactPhone && contactPreference && contactNotes && saveContactBtn && contactPreview) {
+            try {
+                var savedContact = JSON.parse(sessionStorage.getItem(KEYS.publicContactInfo) || '{}');
+                if (savedContact.email) { contactEmail.value = savedContact.email; }
+                if (savedContact.phone) { contactPhone.value = savedContact.phone; }
+                if (savedContact.preference) { contactPreference.value = savedContact.preference; }
+                if (savedContact.notes) { contactNotes.value = savedContact.notes; }
+
+                if (savedContact.email || savedContact.phone) {
+                    contactPreview.textContent = 'Saved: ' +
+                        (savedContact.email ? ('Email ' + savedContact.email) : '') +
+                        (savedContact.email && savedContact.phone ? ' | ' : '') +
+                        (savedContact.phone ? ('Phone ' + savedContact.phone) : '') +
+                        (savedContact.preference ? (' | ' + savedContact.preference) : '');
+                }
+            } catch (error) {
+                // Ignore malformed cached contact data.
+            }
+
+            saveContactBtn.addEventListener('click', function () {
+                var data = {
+                    email: contactEmail.value.trim(),
+                    phone: contactPhone.value.trim(),
+                    preference: contactPreference.value,
+                    notes: contactNotes.value.trim()
+                };
+
+                if (!data.email && !data.phone) {
+                    alert('Add at least one public email or phone number.');
+                    return;
+                }
+
+                sessionStorage.setItem(KEYS.publicContactInfo, JSON.stringify(data));
+                contactPreview.textContent = 'Saved: ' +
+                    (data.email ? ('Email ' + data.email) : '') +
+                    (data.email && data.phone ? ' | ' : '') +
+                    (data.phone ? ('Phone ' + data.phone) : '') +
+                    (data.preference ? (' | ' + data.preference) : '');
+            });
+        }
     }
 
     function bindForm() {
         var form = document.getElementById('create-location-form');
         if (!form) { return; }
 
-        // Demo: just show a notice and go back to locations
+        // Demo: persist a created-location flag and route to the faux host dashboard.
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-            alert('Location saved! (Demo — data is not persisted.)');
-            window.location.href = 'location.html';
+
+            var previousLocationName = sessionStorage.getItem(KEYS.locationName) || '';
+
+            var locationNameInput = document.getElementById('loc-name');
+            var mapQueryInput = document.getElementById('location-query');
+            var savedLocationName = '';
+            var savedLocationAddress = '';
+
+            if (locationNameInput && locationNameInput.value.trim()) {
+                savedLocationName = locationNameInput.value.trim();
+            }
+
+            if (mapQueryInput && mapQueryInput.value.trim()) {
+                savedLocationAddress = mapQueryInput.value.trim();
+
+                if (!savedLocationName) {
+                    savedLocationName = mapQueryInput.value.trim();
+                }
+            } else {
+                savedLocationAddress = 'Madison, WI';
+
+                if (!savedLocationName) {
+                    savedLocationName = 'Your Location';
+                }
+            }
+
+            sessionStorage.setItem(KEYS.createdLocation, 'true');
+            sessionStorage.setItem(KEYS.locationName, savedLocationName);
+            sessionStorage.setItem(KEYS.locationAddress, savedLocationAddress);
+
+            var createdLocations = [];
+            try {
+                createdLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
+            } catch (error) {
+                createdLocations = [];
+            }
+
+            var exists = createdLocations.some(function (entry) {
+                if (typeof entry === 'string') {
+                    return entry === savedLocationName;
+                }
+
+                return entry && entry.name === savedLocationName;
+            });
+
+            if (isEditMode && previousLocationName) {
+                createdLocations = createdLocations.map(function (entry) {
+                    if (typeof entry === 'string') {
+                        if (entry === previousLocationName || entry === savedLocationName) {
+                            return {
+                                name: savedLocationName,
+                                address: savedLocationAddress
+                            };
+                        }
+                        return entry;
+                    }
+
+                    if (!entry) { return entry; }
+
+                    if (entry.name === previousLocationName || entry.name === savedLocationName) {
+                        return {
+                            name: savedLocationName,
+                            address: savedLocationAddress
+                        };
+                    }
+
+                    return entry;
+                });
+
+                exists = createdLocations.some(function (entry) {
+                    return entry && entry.name === savedLocationName;
+                });
+            }
+
+            if (!exists) {
+                createdLocations.unshift({
+                    name: savedLocationName,
+                    address: savedLocationAddress
+                });
+            }
+            sessionStorage.setItem(KEYS.createdLocations, JSON.stringify(createdLocations));
+
+            alert(isEditMode ? 'Location updated!' : 'Location saved! Opening your hosting dashboard preview.');
+            window.location.href = '/hosting/host-dashboard.html';
         });
     }
 
@@ -562,13 +911,16 @@
         if (resetGuestSessionOnReload()) { return; }
 
         enforceAccess();
+        setEditorModeLabels();
         updateSessionBadge();
         loadHostInfo();
+        prefillCoreLocationInputs();
         bindBannerUpload();
         bindProfilePhotoUpload();
         bindLocationMap();
         bindServices();
         bindMaterialAdders();
+        bindListingTools();
         bindForm();
         bindLogout();
     }
