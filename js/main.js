@@ -40,12 +40,43 @@
 
     // AddData function, will eventually load in prebuilt dataset and user's chosen locations, currently handles menus
     function addData(map) {
+        fetch('data/locations.geojson')
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(json){
+                createSymbols(json);
+            })
         createNavMenu();
         // Search goes here
         createTimeFilter();
         createRepeatFilter();
         createZoom();
     };
+
+    // ── Adding initial locations to the map ─────────────────────────────────────
+    function createSymbols(data) {
+        L.geoJson(data, {
+            pointToLayer: function(feature, latlng){
+                return L.marker(latlng);
+            },
+            onEachFeature: function(feature, layer) {
+                // Build popup content, established here because popups themselves do not change.
+                var props = feature.properties;
+                var popupContent = `
+                    <div class="popup-content">
+                        <h3>${props.Name}</h3>
+                        <p><b>Description:</b> ${props.Description}</p>
+                        <p><b>Contact:</b> ${props.Contact}</p>
+                        <p><b>Hours:</b> ${props.Hours}</p>
+                        <p><a href="${props.Link}" target="_blank">Visit Website</a></p>
+                        <p><b>Services:</b> ${props.Services}</p>
+                    </div>
+                `;
+                layer.bindPopup(popupContent);
+            }
+        }).addTo(map);
+}
 
     // ── Filter controls ─────────────────────────────────────────────────────────
 
