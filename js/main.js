@@ -119,9 +119,9 @@
             var services = layer.properties.Services?.toLowerCase() || ''; // Likewise, but for the Services list.
             
             if (!term || name.includes(term) || services.includes(term)) { // If the search bar is empty, or the marker's Name or Services includes the search input...
-                layer.setOpacity(1); // ...Makes the marker visible
+                layer.addTo(map); // Adds the marker to the map
             } else { 
-                layer.setOpacity(0); // ...Makes the marker invisible
+                layer.removeFrom(map); // Remove the marker from the map until it meets search criteria
             }
         });
     };
