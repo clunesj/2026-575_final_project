@@ -996,12 +996,12 @@ body {
 }
 
 /* ── Map landing page — Leaflet navmenu control ── */
-/* Matches the GitHub team's navmenu-implementation. */
 
 .timefilter-container,
 .repeatfilter-container {
     background: rgb(217, 234, 211);
     padding: 5px;
+    border-radius: 4px;
     box-shadow: 0 1px 5px rgba(0,0,0,0.4);
 }
 
@@ -1012,11 +1012,16 @@ body {
     display: block;
 }
 
+.inputbutton {
+    cursor: pointer;
+}
+
 /* Default (closed) state of the navmenu */
 .navmenu-container {
     background: rgb(217, 234, 211);
     padding: 5px;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     transition: all 0.3s;
     max-width: 40px;
@@ -1070,7 +1075,22 @@ body {
     height: 28px;
 }
 
-/* ── Wireframe-inspired location creation page ─────────────────────────────── */
+.searchfilter-container {
+    background: rgb(217, 234, 211);
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+}
+
+.searchfilter-input {
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+    width: 300px;
+}
+
+/* ── Location creation page ─────────────────────────────── */
 
 .hosting-create-page {
     margin: 0;
