@@ -57,9 +57,15 @@
 
     // ── Adding initial locations to the map ─────────────────────────────────────
     function createSymbols(data) {
+        var locationIcon = L.icon({
+            iconUrl: 'img/location.svg',
+            iconSize: [27, 42],
+            iconAnchor: [13.5, 42],
+            popupAnchor: [0, -42]
+        });
         locationsLayer = L.geoJson(data, { // Assign pseudoglobal variable data to make searching possible
             pointToLayer: function(feature, latlng){
-                return L.marker(latlng);
+                return L.marker(latlng, {icon: locationIcon});
             },
             onEachFeature: function(feature, layer) {
                 // Build popup content, established here because popups themselves do not change.
