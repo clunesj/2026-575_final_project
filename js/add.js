@@ -15,8 +15,28 @@
         publicContactInfo: 'commonGoodPublicContactInfo',
         locationServices: 'commonGoodLocationServices',
         hostMaterials: 'commonGoodHostMaterials',
-        guestMaterials: 'commonGoodGuestMaterials'
+        guestMaterials: 'commonGoodGuestMaterials',
+        locationIcon: 'commonGoodLocationIcon',
+        locationBannerPhoto: 'commonGoodLocationBannerPhoto'
     };
+
+    var ICON_OPTIONS = [
+        { file: 'noun-apple-3342636.svg',           label: 'Apple' },
+        { file: 'noun-beef-766576.svg',              label: 'Beef' },
+        { file: 'noun-bike-price-1332193.svg',       label: 'Bike Price' },
+        { file: 'noun-bike-workshop-7430348.svg',    label: 'Bike Workshop' },
+        { file: 'noun-canned-food-7791029.svg',      label: 'Canned Food' },
+        { file: 'noun-family-4528332.svg',           label: 'Family' },
+        { file: 'noun-flour-7974500.svg',            label: 'Flour' },
+        { file: 'noun-housing-subsidy-7641126.svg',  label: 'Housing' },
+        { file: 'noun-location-8365883.svg',         label: 'Location Pin' },
+        { file: 'noun-mechanics-7016396.svg',        label: 'Mechanics' },
+        { file: 'noun-pet-food-8322875.svg',         label: 'Pet Food' },
+        { file: 'noun-toilet-paper-2252674.svg',     label: 'Supplies' },
+        { file: 'noun-tools-8326792.svg',            label: 'Tools' },
+        { file: 'noun-transportation-2200882.svg',   label: 'Transportation' },
+        { file: 'noun-walk-6856320.svg',             label: 'Walk' }
+    ];
 
     var urlParams = new URLSearchParams(window.location.search);
     var isEditMode = urlParams.get('mode') === 'edit';
@@ -188,6 +208,69 @@
         return left || result.display_name || '';
     }
 
+    function normalizeRoadText(value) {
+        if (!value) { return ''; }
+
+        return value
+            .toLowerCase()
+            .replace(/\bavenue\b/g, 'ave')
+            .replace(/\bstreet\b/g, 'st')
+            .replace(/\broad\b/g, 'rd')
+            .replace(/\bboulevard\b/g, 'blvd')
+            .replace(/\bdrive\b/g, 'dr')
+            .replace(/\blane\b/g, 'ln')
+            .replace(/\bcourt\b/g, 'ct')
+            .replace(/\bplace\b/g, 'pl')
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function chooseBestGeocodeResult(query, results) {
+        if (!results || !results.length) {
+            return null;
+        }
+
+        var queryText = normalizeRoadText(query);
+        var queryNumberMatch = queryText.match(/\b(\d{1,6})\b/);
+        var queryNumber = queryNumberMatch ? queryNumberMatch[1] : '';
+        var queryHasUniversity = queryText.indexOf('university') !== -1;
+
+        var scored = results.map(function (item) {
+            var addr = item && item.address ? item.address : {};
+            var display = normalizeRoadText(item.display_name || '');
+            var road = normalizeRoadText(addr.road || addr.pedestrian || addr.footway || '');
+            var city = (addr.city || addr.town || addr.village || '').toLowerCase();
+            var house = String(addr.house_number || '');
+            var score = 0;
+
+            if (city === 'madison') { score += 6; }
+            if (queryNumber && house === queryNumber) { score += 8; }
+            if (queryHasUniversity && road.indexOf('university') !== -1) { score += 6; }
+
+            if (queryText && display.indexOf(queryText) !== -1) {
+                score += 4;
+            } else if (queryText) {
+                var tokens = queryText.split(' ').filter(Boolean);
+                var tokenMatches = tokens.filter(function (token) {
+                    return display.indexOf(token) !== -1;
+                }).length;
+                score += tokenMatches;
+            }
+
+            return {
+                score: score,
+                item: item
+            };
+        });
+
+        scored.sort(function (a, b) {
+            return b.score - a.score;
+        });
+
+        return scored[0].item;
+    }
+
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -270,6 +353,7 @@
                 reader.onload = function (e) {
                     preview.src = e.target.result;
                     zone.classList.add('has-image');
+                    sessionStorage.setItem(KEYS.locationBannerPhoto, e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
@@ -297,10 +381,61 @@
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     listingAvatar.src = e.target.result;
+                    sessionStorage.setItem(KEYS.profilePhoto, e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
         });
+    }
+
+    function makeLocationId(name) {
+        var source = (name || 'location').toLowerCase();
+        var slug = source.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+        return 'loc-' + (slug || 'item') + '-' + Date.now();
+    }
+
+    function buildContactLine() {
+        var contact = parseJsonFromSession(KEYS.publicContactInfo, {});
+        var parts = [];
+
+        if (contact.email) {
+            parts.push('Email ' + contact.email);
+        }
+        if (contact.phone) {
+            parts.push('Phone ' + contact.phone);
+        }
+        if (contact.preference) {
+            parts.push(contact.preference);
+        }
+
+        return parts.join(' | ');
+    }
+
+    function buildLocationRecord(options) {
+        var services = parseJsonFromSession(KEYS.locationServices, []);
+        var socialLinks = parseJsonFromSession(KEYS.socialLinks, []);
+        var description = sessionStorage.getItem(KEYS.locationDescription) || '';
+        var siteUrl = sessionStorage.getItem(KEYS.locationSiteUrl) || '';
+
+        return {
+            locationId: options.locationId,
+            name: options.name,
+            address: options.address,
+            lat: options.lat,
+            lon: options.lon,
+            icon: options.icon,
+            description: description,
+            contact: buildContactLine(),
+            siteUrl: siteUrl,
+            services: services,
+            servicesText: services.map(function (item) {
+                return item && item.name ? item.name : '';
+            }).filter(Boolean).join(', '),
+            socialLinks: socialLinks,
+            profileName: sessionStorage.getItem(KEYS.profileName) || 'Community Host',
+            profilePhoto: sessionStorage.getItem(KEYS.profilePhoto) || '',
+            bannerPhoto: sessionStorage.getItem(KEYS.locationBannerPhoto) || ''
+        };
     }
 
     function setMapLocation(lat, lon, label) {
@@ -399,28 +534,47 @@
         return true;
     }
 
-    function geocodeAndCenter(query) {
-        if (!query) { return; }
+    function geocodeAddress(query, resultLimit) {
+        if (!query) {
+            return Promise.resolve([]);
+        }
 
         var wisconsinQuery = toWisconsinQuery(query);
+        var limit = resultLimit || 1;
         var endpoint =
-            'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&countrycodes=us' +
+            'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=' + limit + '&countrycodes=us' +
             '&viewbox=' + encodeURIComponent(MADISON_VIEWBOX) + '&bounded=1&q=' + encodeURIComponent(wisconsinQuery);
 
-        fetch(endpoint)
-            .then(function (response) { return response.json(); })
+        return fetch(endpoint).then(function (response) {
+            return response.json();
+        });
+    }
+
+    function geocodeAndCenter(query) {
+        if (!query) { return Promise.resolve(null); }
+
+        return geocodeAddress(query, 5)
             .then(function (results) {
                 if (!results || !results.length) {
                     alert('Could not find that location yet. Try a fuller address, city, or ZIP code.');
-                    return;
+                    return null;
                 }
 
-                var top = results[0];
+                var top = chooseBestGeocodeResult(query, results) || results[0];
                 var shortLabel = toShortAddress(top);
-                setMapLocation(parseFloat(top.lat), parseFloat(top.lon), shortLabel);
+                var lat = parseFloat(top.lat);
+                var lon = parseFloat(top.lon);
+                setMapLocation(lat, lon, shortLabel);
+
+                return {
+                    lat: lat,
+                    lon: lon,
+                    label: shortLabel
+                };
             })
             .catch(function () {
                 alert('Map lookup failed. Check your connection and try again.');
+                return null;
             });
     }
 
@@ -467,13 +621,7 @@
                 });
 
             autocompleteTimer = setTimeout(function () {
-                var wisconsinQuery = toWisconsinQuery(value);
-                var endpoint =
-                    'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&countrycodes=us' +
-                    '&viewbox=' + encodeURIComponent(MADISON_VIEWBOX) + '&bounded=1&q=' + encodeURIComponent(wisconsinQuery);
-
-                fetch(endpoint)
-                    .then(function (response) { return response.json(); })
+                geocodeAddress(value, 5)
                     .then(function (results) {
                         suggestions.innerHTML = '';
 
@@ -803,6 +951,59 @@
         }
     }
 
+    function bindIconPicker() {
+        var grid = document.getElementById('icon-picker-grid');
+        var saveBtn = document.getElementById('save-icon-btn');
+        var preview = document.getElementById('icon-preview');
+
+        if (!grid || !saveBtn || !preview) { return; }
+
+        var selectedFile = sessionStorage.getItem(KEYS.locationIcon) || '';
+
+        if (selectedFile) {
+            preview.textContent = 'Current icon: ' + (ICON_OPTIONS.find(function (o) { return o.file === selectedFile; }) || { label: selectedFile }).label;
+        }
+
+        ICON_OPTIONS.forEach(function (option) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'icon-picker-btn' + (selectedFile === option.file ? ' is-selected' : '');
+            btn.setAttribute('aria-label', option.label);
+            btn.setAttribute('title', option.label);
+            btn.dataset.file = option.file;
+
+            var img = document.createElement('img');
+            img.src = '../data/icons/' + option.file;
+            img.alt = option.label;
+
+            var span = document.createElement('span');
+            span.textContent = option.label;
+
+            btn.appendChild(img);
+            btn.appendChild(span);
+
+            btn.addEventListener('click', function () {
+                grid.querySelectorAll('.icon-picker-btn').forEach(function (b) {
+                    b.classList.remove('is-selected');
+                });
+                btn.classList.add('is-selected');
+                selectedFile = option.file;
+            });
+
+            grid.appendChild(btn);
+        });
+
+        saveBtn.addEventListener('click', function () {
+            if (!selectedFile) {
+                alert('Please select an icon first.');
+                return;
+            }
+            sessionStorage.setItem(KEYS.locationIcon, selectedFile);
+            var match = ICON_OPTIONS.find(function (o) { return o.file === selectedFile; });
+            preview.textContent = 'Current icon: ' + (match ? match.label : selectedFile);
+        });
+    }
+
     function bindForm() {
         var form = document.getElementById('create-location-form');
         if (!form) { return; }
@@ -836,64 +1037,87 @@
                 }
             }
 
-            sessionStorage.setItem(KEYS.createdLocation, 'true');
-            sessionStorage.setItem(KEYS.locationName, savedLocationName);
-            sessionStorage.setItem(KEYS.locationAddress, savedLocationAddress);
+            geocodeAndCenter(savedLocationAddress)
+                .then(function (geocodedPoint) {
+                    if (!geocodedPoint) {
+                        alert('Could not save location coordinates. Please verify the address and try again.');
+                        return;
+                    }
 
-            var createdLocations = [];
-            try {
-                createdLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
-            } catch (error) {
-                createdLocations = [];
-            }
+                    sessionStorage.setItem(KEYS.createdLocation, 'true');
+                    sessionStorage.setItem(KEYS.locationName, savedLocationName);
+                    sessionStorage.setItem(KEYS.locationAddress, savedLocationAddress);
 
-            var exists = createdLocations.some(function (entry) {
-                if (typeof entry === 'string') {
-                    return entry === savedLocationName;
-                }
+                    var savedLat = geocodedPoint.lat;
+                    var savedLon = geocodedPoint.lon;
+                    var selectedIconBtn = document.querySelector('.icon-picker-btn.is-selected');
+                    var savedIcon = selectedIconBtn ? selectedIconBtn.dataset.file : (sessionStorage.getItem(KEYS.locationIcon) || '');
 
-                return entry && entry.name === savedLocationName;
-            });
+                    var createdLocations = [];
+                    try {
+                        createdLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
+                    } catch (error) {
+                        createdLocations = [];
+                    }
 
-            if (isEditMode && previousLocationName) {
-                createdLocations = createdLocations.map(function (entry) {
-                    if (typeof entry === 'string') {
-                        if (entry === previousLocationName || entry === savedLocationName) {
-                            return {
-                                name: savedLocationName,
-                                address: savedLocationAddress
-                            };
+                    var matchByName = function (entry) {
+                        if (typeof entry === 'string') {
+                            return entry === savedLocationName || entry === previousLocationName;
                         }
-                        return entry;
+                        return entry && (entry.name === savedLocationName || entry.name === previousLocationName);
+                    };
+                    var matchedEntry = createdLocations.find(matchByName);
+                    var locationId = matchedEntry && matchedEntry.locationId
+                        ? matchedEntry.locationId
+                        : makeLocationId(savedLocationName);
+                    var nextRecord = buildLocationRecord({
+                        locationId: locationId,
+                        name: savedLocationName,
+                        address: savedLocationAddress,
+                        lat: savedLat,
+                        lon: savedLon,
+                        icon: savedIcon
+                    });
+
+                    var exists = createdLocations.some(function (entry) {
+                        if (typeof entry === 'string') {
+                            return entry === savedLocationName;
+                        }
+
+                        return entry && entry.name === savedLocationName;
+                    });
+
+                    if (isEditMode && previousLocationName) {
+                        createdLocations = createdLocations.map(function (entry) {
+                            if (typeof entry === 'string') {
+                                if (entry === previousLocationName || entry === savedLocationName) {
+                                    return nextRecord;
+                                }
+                                return entry;
+                            }
+
+                            if (!entry) { return entry; }
+
+                            if (entry.name === previousLocationName || entry.name === savedLocationName) {
+                                return nextRecord;
+                            }
+
+                            return entry;
+                        });
+
+                        exists = createdLocations.some(function (entry) {
+                            return entry && entry.name === savedLocationName;
+                        });
                     }
 
-                    if (!entry) { return entry; }
-
-                    if (entry.name === previousLocationName || entry.name === savedLocationName) {
-                        return {
-                            name: savedLocationName,
-                            address: savedLocationAddress
-                        };
+                    if (!exists) {
+                        createdLocations.unshift(nextRecord);
                     }
+                    sessionStorage.setItem(KEYS.createdLocations, JSON.stringify(createdLocations));
 
-                    return entry;
+                    alert(isEditMode ? 'Location updated!' : 'Location saved! Opening your hosting dashboard preview.');
+                    window.location.href = '/hosting/host-dashboard.html';
                 });
-
-                exists = createdLocations.some(function (entry) {
-                    return entry && entry.name === savedLocationName;
-                });
-            }
-
-            if (!exists) {
-                createdLocations.unshift({
-                    name: savedLocationName,
-                    address: savedLocationAddress
-                });
-            }
-            sessionStorage.setItem(KEYS.createdLocations, JSON.stringify(createdLocations));
-
-            alert(isEditMode ? 'Location updated!' : 'Location saved! Opening your hosting dashboard preview.');
-            window.location.href = '/hosting/host-dashboard.html';
         });
     }
 
@@ -920,6 +1144,7 @@
         bindLocationMap();
         bindServices();
         bindMaterialAdders();
+        bindIconPicker();
         bindListingTools();
         bindForm();
         bindLogout();

@@ -108,7 +108,13 @@
                                 </div>
                             </div>
 
-                            <button class="hosting-tool-toggle" type="button" data-target="tool-icons">Map Display Icons (Coming soon)</button>
+                            <button class="hosting-tool-toggle" type="button" data-target="tool-icons">Map Display Icons</button>
+                            <div class="hosting-tool-panel" id="tool-icons" hidden>
+                                <label>Choose a map icon for your location:</label>
+                                <div class="icon-picker-grid" id="icon-picker-grid"></div>
+                                <button class="hosting-upload-btn" id="save-icon-btn" type="button">Save Icon</button>
+                                <p class="hosting-tool-preview" id="icon-preview">No icon selected yet.</p>
+                            </div>
 
                             <button class="hosting-tool-toggle" type="button" data-target="tool-contact">Public Contact Info</button>
                             <div class="hosting-tool-panel" id="tool-contact" hidden>

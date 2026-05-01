@@ -47,6 +47,7 @@
             })
             .then(function(json){
                 createSymbols(json);
+                addUserLocations();
             })
         createNavMenu();
         createSearchFilter();
@@ -54,6 +55,65 @@
         // createRepeatFilter(); -- Nonfunctional, see createRepeatFilter() definition.
         createZoom();
     };
+
+    function escapeHtml(value) {
+        var text = value === null || value === undefined ? '' : String(value);
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function buildDetailsUrl(properties) {
+        if (!properties) {
+            return 'location-details.html';
+        }
+
+        if (properties.isUserCreated) {
+            var params = ['source=user'];
+            if (properties.userLocationId) {
+                params.push('id=' + encodeURIComponent(properties.userLocationId));
+            }
+            if (properties.Name) {
+                params.push('name=' + encodeURIComponent(properties.Name));
+            }
+            return 'location-details.html?' + params.join('&');
+        }
+
+        if (properties.Key !== undefined && properties.Key !== null) {
+            return 'location-details.html?source=dataset&id=' + encodeURIComponent(properties.Key);
+        }
+
+        return 'location-details.html';
+    }
+
+    function buildPopupContent(properties) {
+        var name = escapeHtml(properties && properties.Name ? properties.Name : 'Community Location');
+        var description = escapeHtml(properties && properties.Description ? properties.Description : 'No description available yet.');
+        var contact = escapeHtml(properties && properties.Contact ? properties.Contact : 'Not listed');
+        var hours = escapeHtml(properties && properties.Hours ? properties.Hours : 'Not listed');
+        var services = escapeHtml(properties && properties.Services ? properties.Services : 'Not listed');
+        var link = properties && properties.Link ? properties.Link : '';
+        var detailsUrl = buildDetailsUrl(properties || {});
+
+        var websiteLine = link
+            ? '<p><a href="' + escapeHtml(link) + '" target="_blank" rel="noopener noreferrer">Visit Website</a></p>'
+            : '<p><span class="popup-muted">Website not listed</span></p>';
+
+        return [
+            '<div class="popup-content">',
+            '<h3>' + name + '</h3>',
+            '<p><b>Description:</b> ' + description + '</p>',
+            '<p><b>Contact:</b> ' + contact + '</p>',
+            '<p><b>Hours:</b> ' + hours + '</p>',
+            websiteLine,
+            '<p><b>Services:</b> ' + services + '</p>',
+            '<p><a href="' + detailsUrl + '">Details</a></p>',
+            '</div>'
+        ].join('');
+    }
 
     // ── Adding initial locations to the map ─────────────────────────────────────
     function createSymbols(data) {
@@ -65,25 +125,63 @@
         });
         locationsLayer = L.geoJson(data, { // Assign pseudoglobal variable data to make searching possible
             pointToLayer: function(feature, latlng){
-                return L.marker(latlng, {icon: locationIcon});
+                if (feature.properties && feature.properties.iconFile) {
+                    var customIcon = L.icon({
+                        iconUrl: 'data/icons/' + feature.properties.iconFile,
+                        iconSize: [36, 36],
+                        iconAnchor: [18, 36],
+                        popupAnchor: [0, -36]
+                    });
+                    return L.marker(latlng, { icon: customIcon });
+                }
+                return L.marker(latlng, { icon: locationIcon });
             },
             onEachFeature: function(feature, layer) {
                 // Build popup content, established here because popups themselves do not change.
                 layer.properties = feature.properties;
-                var popupContent = `
-                    <div class="popup-content">
-                        <h3>${layer.properties.Name}</h3>
-                        <p><b>Description:</b> ${layer.properties.Description}</p>
-                        <p><b>Contact:</b> ${layer.properties.Contact}</p>
-                        <p><b>Hours:</b> ${layer.properties.Hours}</p>
-                        <p><a href="${layer.properties.Link}" target="_blank">Visit Website</a></p>
-                        <p><b>Services:</b> ${layer.properties.Services}</p>
-                    </div>
-                `;
+                var popupContent = buildPopupContent(layer.properties);
                 layer.bindPopup(popupContent);
             }
         }).addTo(map);
 }
+
+    // ── User-created locations from sessionStorage ──────────────────────────────
+    function addUserLocations() {
+        var raw;
+        try {
+            raw = JSON.parse(sessionStorage.getItem('commonGoodCreatedLocations') || '[]');
+        } catch (e) {
+            raw = [];
+        }
+
+        raw.forEach(function (entry, index) {
+            if (!entry || typeof entry !== 'object') { return; }
+            var lat = entry.lat;
+            var lon = entry.lon;
+            if (lat === null || lat === undefined || lon === null || lon === undefined) { return; }
+
+            var feature = {
+                type: 'Feature',
+                properties: {
+                    Name: entry.name || 'Your Location',
+                    Description: entry.description || '',
+                    Contact: entry.contact || '',
+                    Hours: entry.hours || '',
+                    Link: entry.siteUrl || '',
+                    Services: entry.servicesText || '',
+                    iconFile: entry.icon || '',
+                    isUserCreated: true,
+                    userLocationId: entry.locationId || ('legacy-' + index)
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: [lon, lat]
+                }
+            };
+
+            locationsLayer.addData(feature);
+        });
+    }
 
     // ── Filter controls ─────────────────────────────────────────────────────────
 
