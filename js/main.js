@@ -128,9 +128,9 @@
                 if (feature.properties && feature.properties.iconFile) {
                     var customIcon = L.icon({
                         iconUrl: 'data/icons/' + feature.properties.iconFile,
-                        iconSize: [36, 36],
-                        iconAnchor: [18, 36],
-                        popupAnchor: [0, -36]
+                        iconSize: [36, 36], // Size of marker icon
+                        iconAnchor: [18, 36], // Position on icon that represents the location
+                        popupAnchor: [0, -36] // Position realtive to anchor that the popup originates from.
                     });
                     return L.marker(latlng, { icon: customIcon });
                 }
@@ -198,9 +198,14 @@
                 input.type = 'text'; // Sets input type of the search bar to text.
                 input.placeholder = 'Search location name or service type...'; // Sets search bar placeholder text, i.e. when nothing is typed.
 
+                // Search suggestions accelerator
+                var suggestionsDropdown = L.DomUtil.create('div', 'searchfilter-suggestions', container);
+                suggestionsDropdown.style.display = 'none'; // Suggestions dropdown does not display on page load.
+
                 // Event listener for search filtering
                 L.DomEvent.on(input, 'input', function () {
-                    filterLocations(input.value);
+                    searchFilterLocations(input.value);
+                    updateSuggestions(input.value, suggestionsDropdown, input)
                 })
 
 
@@ -213,7 +218,7 @@
         map.addControl(new searchFilter());
     };
 
-    function filterLocations(searchTerm) {
+    function searchFilterLocations(searchTerm) {
         var term = searchTerm.toLowerCase().trim(); // Reads the search input, saves it as a lowercase string with no whitespace
 
         locationsLayer.eachLayer(function(layer) { // Iterate through each point on the map...
@@ -228,6 +233,45 @@
                 layer.removeFrom(map); // Remove the marker from the map until it meets search criteria
             }
         });
+    };
+
+    function updateSuggestions(searchTerm, dropdown, input) {
+        var term = searchTerm.toLowerCase().trim();
+        dropdown.innerHTML = ''; // Resets dropdown contents to prevent overflowing when search term changes.
+
+        // If there is no search term, disable the suggestions dropdown.
+        if (!term) {
+            dropdown.style.display = 'none';
+            return;
+        }
+
+        var suggestions = []; // Initialize array to hold suggestions
+        locationsLayer.eachLayer(function(layer){ // Iterate through each marker on the map...
+            if (!layer.properties) return; // In case a point has no properties, skip it.
+            var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
+
+            // Adding location names to suggestions
+            if (name.includes(term) && suggestions.length < 5) { // If the current search term is a part of the marker's name, and there are not 5 suggestions in the array...
+                suggestions.push(layer.properties.Name); // Add the location name to the suggestions list.
+            }
+        });
+
+        // Displaying suggestions when a term is searched
+        if (suggestions.length > 0) {
+            dropdown.style.display = 'block'; // Set the display style to block, showing the suggestions.
+                    
+            suggestions.forEach(function(name) { // For each item in the suggestions array
+            var item = L.DomUtil.create('div', 'suggestion-item', dropdown); // Create a new div for the suggestion
+            item.textContent = name; // Set the textContent of the div to the name of the location.
+            L.DomEvent.on(item, 'click', function() { // When the suggestion div is clicked...
+                input.value = name; // Fill the search filter with the name of the location
+                searchFilterLocations(name); // Pass the name into searchFilterLocations, narrowing the search to the one location
+                dropdown.style.display = 'none'; // Remove the suggestions display.
+            });
+        });
+        } else {
+            dropdown.style.display = 'none';
+        }
     };
 
     // Create time filter control
