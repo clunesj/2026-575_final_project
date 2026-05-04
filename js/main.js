@@ -4,7 +4,8 @@
     // Pseudoglobal Variables
     var map;
     var locationsLayer; // Enables filtering via search and other filter controls
-    var accessMode = sessionStorage.getItem('commonGoodAccessMode');
+    var accessMode = sessionStorage.getItem('commonGoodAccessMode')
+    var activeFilters = { searchTerm: '', timeMode: 'anytime'}; // updating so filters work in concert -jc
 
     // ── Guest session: clear data on page reload ────────────────────────────────
     function handleGuestReload() {
@@ -198,9 +199,22 @@
 
                 // Event listener for search filtering
                 L.DomEvent.on(input, 'input', function () {
-                    searchFilterLocations(input.value);
+                    activeFilters.searchTerm = input.value;
+                    applyFilters();
                     updateSuggestions(input.value, suggestionsDropdown, input)
-                })
+                });
+
+                    //add a reset button to clear search filter: jc
+                var resetButton = L.DomUtil.create('button', 'searchfilter-reset', container);
+                resetButton.innerHTML = '↺';
+                resetButton.title = 'Clear search';
+                L.DomEvent.on(resetButton, 'click', function () {
+                    input.value = '';
+                    // searchFilterLocations('');
+                    activeFilters.searchTerm = '';
+                    applyFilters();
+                    suggestionsDropdown.style.display = 'none';
+                });
 
 
                 // Disable click propagation
@@ -212,22 +226,77 @@
         map.addControl(new searchFilter());
     };
 
-    function searchFilterLocations(searchTerm) {
-        var term = searchTerm.toLowerCase().trim(); // Reads the search input, saves it as a lowercase string with no whitespace
+    // commenting out to try a filter that works with both 11:20 jc
+    // function searchFilterLocations(searchTerm) {
+    //     var term = searchTerm.toLowerCase().trim(); // Reads the search input, saves it as a lowercase string with no whitespace
+
+    //     locationsLayer.eachLayer(function(layer) { // Iterate through each point on the map...
+    //         if (!layer.properties) return; // In case a point has no properties, skip it.
+
+    //         var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
+    //         var services = layer.properties.Services?.toLowerCase() || ''; // Likewise, but for the Services list.
+            
+    //         if (!term || name.includes(term) || services.includes(term)) { // If the search bar is empty, or the marker's Name or Services includes the search input...
+    //             layer.addTo(map); // Adds the marker to the map
+    //         } else { 
+    //             layer.removeFrom(map); // Remove the marker from the map until it meets search criteria
+    //         }
+    //     });
+    // };\
+
+    function applyFilters(){
+        var term = activeFilters.searchTerm.toLowerCase().trim(); // Reads the search input, saves it as a lowercase string with no whitespace
+        var mode = activeFilters.timeMode;
 
         locationsLayer.eachLayer(function(layer) { // Iterate through each point on the map...
             if (!layer.properties) return; // In case a point has no properties, skip it.
 
             var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
             var services = layer.properties.Services?.toLowerCase() || ''; // Likewise, but for the Services list.
-            
-            if (!term || name.includes(term) || services.includes(term)) { // If the search bar is empty, or the marker's Name or Services includes the search input...
+            var matchesSearch = !term || name.includes(term) || services.includes(term);
+
+            var matchesTime = true;
+            if (mode === 'rightnow') {
+                matchesTime = isOpenNow(layer.properties.HoursParsed); //not to be confused with hoursParsed!
+            }
+
+            if (matchesSearch && matchesTime) { //If it matches search and matches time...
                 layer.addTo(map); // Adds the marker to the map
             } else { 
                 layer.removeFrom(map); // Remove the marker from the map until it meets search criteria
             }
         });
     };
+
+    function isOpenNow(hoursParsed) { 
+        if (hoursParsed === null) return true; // always show unknown hours
+        var now = new Date();
+        var day = (now.getDate() + 6) % 7; // convert JS Sunday = 0 to Monday = 0
+        var time = now.getHours() * 100 + now.getMinutes();
+        var todayHours = hoursParsed[day];
+        if (todayHours === null) return false; // closed on certain days!
+        var open = todayHours[0], close = todayHours[1];
+        if (close < open){ // overnight span
+            return time >= open || time < close;
+        }
+        return time >= open && time < close;
+    };
+
+    // Commenting out to try a filter that works with both 11:20 jc
+    // function timeFilterLocations(mode) { // this is the function to filter based on if the hours match now
+    //     locationsLayer.eachLayer(function(layer) {
+    //         if (!layer.properties) return;
+    //         if(mode === 'rightnow') {
+    //             if (isOpenNow(layer.properties.HoursParsed)) {
+    //                 layer.addTo(map);
+    //             } else {
+    //                 layer.removeFrom(map);
+    //             }
+    //         } else {
+    //             layer.addTo(map);
+    //             }
+    //         });
+    // }
 
     function updateSuggestions(searchTerm, dropdown, input) {
         var term = searchTerm.toLowerCase().trim();
@@ -239,27 +308,52 @@
             return;
         }
 
+        var seen = {}; // avoiding duplicates by tracking service types already added
         var suggestions = []; // Initialize array to hold suggestions
+        
         locationsLayer.eachLayer(function(layer){ // Iterate through each marker on the map...
             if (!layer.properties) return; // In case a point has no properties, skip it.
-            var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
+            
+            // added 5/3 jc
+            var servicesRaw = layer.properties.Services || '';
 
-            // Adding location names to suggestions
-            if (name.includes(term) && suggestions.length < 5) { // If the current search term is a part of the marker's name, and there are not 5 suggestions in the array...
-                suggestions.push(layer.properties.Name); // Add the location name to the suggestions list.
-            }
+            servicesRaw.split(',').forEach(function(serviceType) {
+                var trimmed = serviceType.trim(); // remove whitespace around the tags
+                var lower = trimmed.toLowerCase();
+             // this essentially does what the other function did for name, except with services
+
+                if (lower.includes(term) && !seen[lower] && suggestions.length <5) {
+                    seen[lower] = true;
+                    suggestions.push(trimmed);
+                }
+
+            // uncomment this below for name search: jc
+            
+        //     var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
+
+        //     // Adding location names to suggestions
+        //     if (name.includes(term) && suggestions.length < 5) { // If the current search term is a part of the marker's name, and there are not 5 suggestions in the array...
+        //         suggestions.push(layer.properties.Name); // Add the location name to the suggestions list.
+        //     }
+            });
         });
 
         // Displaying suggestions when a term is searched
         if (suggestions.length > 0) {
             dropdown.style.display = 'block'; // Set the display style to block, showing the suggestions.
-                    
-            suggestions.forEach(function(name) { // For each item in the suggestions array
+            
+            suggestions.forEach(function(serviceType){ // for each item in the suggestion arrayy...
+            // suggestions.forEach(function(name) { // For each item in the suggestions array
             var item = L.DomUtil.create('div', 'suggestion-item', dropdown); // Create a new div for the suggestion
-            item.textContent = name; // Set the textContent of the div to the name of the location.
+            item.textContent = serviceType; // set content of div to the service type of the locaiton
+            // item.textContent = name; // Set the textContent of the div to the name of the location.
             L.DomEvent.on(item, 'click', function() { // When the suggestion div is clicked...
-                input.value = name; // Fill the search filter with the name of the location
-                searchFilterLocations(name); // Pass the name into searchFilterLocations, narrowing the search to the one location
+                input.value = serviceType;
+                // input.value = name; // Fill the search filter with the name of the location
+                // searchFilterLocations(serviceType); // same as below except with serviceType
+                // searchFilterLocations(name); // Pass the name into searchFilterLocations, narrowing the search to the one location
+                activeFilters.searchTerm =serviceType;
+                applyFilters();
                 dropdown.style.display = 'none'; // Remove the suggestions display.
             });
         });
@@ -281,7 +375,6 @@
                 // Container content
                 var content = L.DomUtil.create('div', 'timefilter-content', container);
                 content.innerHTML = `
-                    <p>Location Availability<br><b>(NON-FUNCTIONAL)</b></p>
                     <div>
                         <input type = 'radio' class = 'inputbutton' id = 'rightnow' name = 'availability' value = 'rightnow'>
                         <label for = 'rightnow'>Right Now</label>
@@ -295,6 +388,14 @@
                         <label for = 'custom'>Custom</label>
                     </div>
                 `;
+
+                var radios = content.querySelectorAll('input[name="availability"]');
+                radios.forEach(function(radio) {
+                    L.DomEvent.on(radio, 'change', function() {
+                        activeFilters.timeMode = radio.value;
+                        applyFilters();
+                    });
+                });
 
                 // Disable click propagation
                 L.DomEvent.disableClickPropagation(container);

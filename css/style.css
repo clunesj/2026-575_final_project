@@ -1080,6 +1080,7 @@ body {
     padding: 8px;
     border-radius: 4px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+    vertical-align: middle;
 }
 
 .searchfilter-input {
@@ -1096,6 +1097,26 @@ body {
     border: 1px solid #ccc;
     max-height: 150px;
     width: 100%;
+}
+
+/* search filter reset loop - jc */
+.searchfilter-reset {
+    background: white;
+    border: none;
+    border-radius: 10%;
+    width: 28px;
+    height: 28px;
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 0px;
+    padding: 0px;
+    margin-left: 4px;
+    /* margin-top: 0px; */
+    vertical-align: middle;
+}
+
+.searchfilter-reset:hover {
+    background: #e0e0e0;
 }
 
 .suggestion-item {
