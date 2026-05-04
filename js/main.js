@@ -258,6 +258,8 @@
             var matchesTime = true;
             if (mode === 'rightnow') {
                 matchesTime = isOpenNow(layer.properties.HoursParsed); //not to be confused with hoursParsed!
+            } else if (mode === 'custom' && activeFilters.customTime) {
+                matchesTime = isOpenAtTime(layer.properties.HoursParsed, activeFilters.customTime)
             }
 
             if (matchesSearch && matchesTime) { //If it matches search and matches time...
@@ -269,7 +271,7 @@
     };
 
     function isOpenNow(hoursParsed) { 
-        if (hoursParsed === null) return true; // always show unknown hours
+        if (hoursParsed === null) return true; // always show locations with unknown hours, i.e. "Check website for hours."
         var now = new Date();
         var day = (now.getDate() + 6) % 7; // convert JS Sunday = 0 to Monday = 0
         var time = now.getHours() * 100 + now.getMinutes();
@@ -281,6 +283,27 @@
         }
         return time >= open && time < close;
     };
+
+    function isOpenAtTime(hoursParsed, timeString) {
+        if (hoursParsed === null) return true; // always show locations with unknown hours, i.e. "Check website for hours."
+    
+        // Parse timeString "HH:MM" to match HoursParsed in locations.geojson
+        var timeParts = timeString.split(':');
+        var time = parseInt(timeParts[0]) * 100 + parseInt(timeParts[1]);
+        
+        // Getting current day to retrieve current day of the week
+        var now = new Date();
+        var day = (now.getDate() + 6) % 7;
+        var todayHours = hoursParsed[day];
+        
+        if (todayHours === null) return false; // Always return false if location is closed
+        
+        var open = todayHours[0], close = todayHours[1];
+        if (close < open) { // overnight span
+            return time >= open || time < close;
+        }
+        return time >= open && time < close;
+    }
 
     // Commenting out to try a filter that works with both 11:20 jc
     // function timeFilterLocations(mode) { // this is the function to filter based on if the hours match now
@@ -372,9 +395,10 @@
                 // Create control container div
                 var container = L.DomUtil.create('div', 'timefilter-container');
 
-                // Container content
+                // Container content, custom time input is hidden until the option is selected.
                 var content = L.DomUtil.create('div', 'timefilter-content', container);
                 content.innerHTML = `
+                    <b>Filter to locations available...</b>
                     <div>
                         <input type = 'radio' class = 'inputbutton' id = 'rightnow' name = 'availability' value = 'rightnow'>
                         <label for = 'rightnow'>Right Now</label>
@@ -387,15 +411,35 @@
                         <input type = 'radio' class = 'inputbutton' id = 'custom' name = 'availability' value = 'custom'>
                         <label for = 'custom'>Custom</label>
                     </div>
+                    <div id = 'custom-time-input' style = 'display: none;'>
+                        <input type = 'time' id = 'custom-time' placeholder='Select time (HH:MM)'>
+                    </div>
                 `;
 
                 var radios = content.querySelectorAll('input[name="availability"]');
+                var customTimeInput = content.querySelector('#custom-time');
+                var customTimeContainer = content.querySelector('#custom-time-input');
+
                 radios.forEach(function(radio) {
-                    L.DomEvent.on(radio, 'change', function() {
-                        activeFilters.timeMode = radio.value;
+                    L.DomEvent.on(radio, 'change', function() { // When one of the radio buttons is pressed...
+                        activeFilters.timeMode = radio.value; // Change the value of activeFilters's timeMode attribute to the value of that radio button ('rightnow', 'anytime', or 'custom'.)
+
+                        // Show/hide custom time input
+                        if (radio.value === 'custom') {
+                            customTimeContainer.style.display = 'block'
+                        } else {
+                            customTimeContainer.style.display = 'none'
+                        }
+
                         applyFilters();
                     });
                 });
+
+                // Listen for custom time changes
+                L.DomEvent.on(customTimeInput, 'change', function() {
+                    activeFilters.customTime = customTimeInput.value;
+                    applyFilters();
+                })
 
                 // Disable click propagation
                 L.DomEvent.disableClickPropagation(container);
