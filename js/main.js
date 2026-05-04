@@ -111,7 +111,7 @@
             '<p><b>Hours:</b> ' + hours + '</p>',
             websiteLine,
             '<p><b>Services:</b> ' + services + '</p>',
-            '<p><a href="' + detailsUrl + '">Details</a></p>',
+            '<p><a href="' + detailsUrl + '" class = "popup-button">Details...</a></p>',
             '</div>'
         ].join('');
     }
