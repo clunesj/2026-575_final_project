@@ -262,7 +262,7 @@ body {
 			padding: 10px 20px;
 			text-align: center;
 			text-decoration: none;
-			display: inline-block;
+			display: block;
 			font-size: 16px;
 			margin: 4px 2px;
 			cursor: pointer;
@@ -1104,7 +1104,9 @@ body {
     padding: 8px;
     border-radius: 4px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
 
 .searchfilter-input {
