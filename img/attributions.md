@@ -1,0 +1,1 @@
+All files in img/map-icons from [openstreetmap-carto](https://github.com/openstreetmap-carto/openstreetmap-carto).
