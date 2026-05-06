@@ -6,6 +6,33 @@
     var locationsLayer; // Enables filtering via search and other filter controls
     var accessMode = sessionStorage.getItem('commonGoodAccessMode')
     var activeFilters = { searchTerm: '', timeMode: 'anytime'}; // updating so filters work in concert -jc
+    var MAP_ICON_ALLOWLIST = [
+        'bicycle.svg',
+        'courthouse.svg',
+        'diy.svg',
+        'garden_centre.svg',
+        'hotel.svg',
+        'library.svg',
+        'restaurant.svg',
+        'social_facility.svg',
+        'trade.svg'
+    ];
+
+    function buildMapIcon(iconFileName) {
+        if (!iconFileName) { return null; }
+
+        var normalized = String(iconFileName).split('/').pop();
+        if (MAP_ICON_ALLOWLIST.indexOf(normalized) === -1) {
+            return null;
+        }
+
+        return L.icon({
+            iconUrl: 'img/map-icons/' + normalized,
+            iconSize: [34, 34],
+            iconAnchor: [17, 34],
+            popupAnchor: [0, -34]
+        });
+    }
 
     // ── Guest session: clear data on page reload ────────────────────────────────
     function handleGuestReload() {
@@ -126,13 +153,10 @@
         locationsLayer = L.geoJson(data, { // Assign pseudoglobal variable data to make searching possible
             pointToLayer: function(feature, latlng){
                 if (feature.properties && feature.properties.iconFile) {
-                    var customIcon = L.icon({
-                        iconUrl: 'data/icons/' + feature.properties.iconFile,
-                        iconSize: [36, 36], // Size of marker icon
-                        iconAnchor: [18, 36], // Position on icon that represents the location
-                        popupAnchor: [0, -36] // Position realtive to anchor that the popup originates from.
-                    });
-                    return L.marker(latlng, { icon: customIcon });
+                    var customIcon = buildMapIcon(feature.properties.iconFile);
+                    if (customIcon) {
+                        return L.marker(latlng, { icon: customIcon });
+                    }
                 }
                 return L.marker(latlng);
             },
