@@ -16,27 +16,8 @@
         locationServices: 'commonGoodLocationServices',
         hostMaterials: 'commonGoodHostMaterials',
         guestMaterials: 'commonGoodGuestMaterials',
-        locationIcon: 'commonGoodLocationIcon',
         locationBannerPhoto: 'commonGoodLocationBannerPhoto'
     };
-
-    var ICON_OPTIONS = [
-        { file: 'noun-apple-3342636.svg',           label: 'Apple' },
-        { file: 'noun-beef-766576.svg',              label: 'Beef' },
-        { file: 'noun-bike-price-1332193.svg',       label: 'Bike Price' },
-        { file: 'noun-bike-workshop-7430348.svg',    label: 'Bike Workshop' },
-        { file: 'noun-canned-food-7791029.svg',      label: 'Canned Food' },
-        { file: 'noun-family-4528332.svg',           label: 'Family' },
-        { file: 'noun-flour-7974500.svg',            label: 'Flour' },
-        { file: 'noun-housing-subsidy-7641126.svg',  label: 'Housing' },
-        { file: 'noun-location-8365883.svg',         label: 'Location Pin' },
-        { file: 'noun-mechanics-7016396.svg',        label: 'Mechanics' },
-        { file: 'noun-pet-food-8322875.svg',         label: 'Pet Food' },
-        { file: 'noun-toilet-paper-2252674.svg',     label: 'Supplies' },
-        { file: 'noun-tools-8326792.svg',            label: 'Tools' },
-        { file: 'noun-transportation-2200882.svg',   label: 'Transportation' },
-        { file: 'noun-walk-6856320.svg',             label: 'Walk' }
-    ];
 
     var urlParams = new URLSearchParams(window.location.search);
     var isEditMode = urlParams.get('mode') === 'edit';
@@ -101,7 +82,7 @@
 
         var submitButton = document.querySelector('#create-location-form button[type="submit"]');
         if (submitButton) {
-            submitButton.textContent = 'Save Location Changes';
+            submitButton.textContent = 'Save Changes to CommonGood';
         }
     }
 
@@ -587,9 +568,48 @@
 
         if (!initLocationPreviewMap()) { return; }
 
+        var saveAddressBtn = document.getElementById('save-address-btn');
+        var saveAddressStatus = document.getElementById('save-address-status');
+
         centerButton.addEventListener('click', function () {
             geocodeAndCenter(queryInput.value.trim());
         });
+
+        if (saveAddressBtn) {
+            saveAddressBtn.addEventListener('click', function () {
+                var query = queryInput.value.trim();
+                if (!query) {
+                    alert('Enter an address before saving.');
+                    return;
+                }
+
+                saveAddressBtn.disabled = true;
+                saveAddressBtn.textContent = 'Saving…';
+
+                geocodeAndCenter(query)
+                    .then(function (geocodedPoint) {
+                        if (!geocodedPoint) {
+                            saveAddressBtn.disabled = false;
+                            saveAddressBtn.textContent = 'Save Address';
+                            return;
+                        }
+
+                        sessionStorage.setItem(KEYS.locationAddress, query);
+
+                        saveAddressBtn.disabled = false;
+                        saveAddressBtn.textContent = 'Save Address';
+
+                        if (saveAddressStatus) {
+                            saveAddressStatus.textContent = '✓ Address saved: ' + geocodedPoint.label;
+                            saveAddressStatus.hidden = false;
+                        }
+                    })
+                    .catch(function () {
+                        saveAddressBtn.disabled = false;
+                        saveAddressBtn.textContent = 'Save Address';
+                    });
+            });
+        }
 
         queryInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
@@ -951,59 +971,6 @@
         }
     }
 
-    function bindIconPicker() {
-        var grid = document.getElementById('icon-picker-grid');
-        var saveBtn = document.getElementById('save-icon-btn');
-        var preview = document.getElementById('icon-preview');
-
-        if (!grid || !saveBtn || !preview) { return; }
-
-        var selectedFile = sessionStorage.getItem(KEYS.locationIcon) || '';
-
-        if (selectedFile) {
-            preview.textContent = 'Current icon: ' + (ICON_OPTIONS.find(function (o) { return o.file === selectedFile; }) || { label: selectedFile }).label;
-        }
-
-        ICON_OPTIONS.forEach(function (option) {
-            var btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'icon-picker-btn' + (selectedFile === option.file ? ' is-selected' : '');
-            btn.setAttribute('aria-label', option.label);
-            btn.setAttribute('title', option.label);
-            btn.dataset.file = option.file;
-
-            var img = document.createElement('img');
-            img.src = '../data/icons/' + option.file;
-            img.alt = option.label;
-
-            var span = document.createElement('span');
-            span.textContent = option.label;
-
-            btn.appendChild(img);
-            btn.appendChild(span);
-
-            btn.addEventListener('click', function () {
-                grid.querySelectorAll('.icon-picker-btn').forEach(function (b) {
-                    b.classList.remove('is-selected');
-                });
-                btn.classList.add('is-selected');
-                selectedFile = option.file;
-            });
-
-            grid.appendChild(btn);
-        });
-
-        saveBtn.addEventListener('click', function () {
-            if (!selectedFile) {
-                alert('Please select an icon first.');
-                return;
-            }
-            sessionStorage.setItem(KEYS.locationIcon, selectedFile);
-            var match = ICON_OPTIONS.find(function (o) { return o.file === selectedFile; });
-            preview.textContent = 'Current icon: ' + (match ? match.label : selectedFile);
-        });
-    }
-
     function bindForm() {
         var form = document.getElementById('create-location-form');
         if (!form) { return; }
@@ -1050,8 +1017,6 @@
 
                     var savedLat = geocodedPoint.lat;
                     var savedLon = geocodedPoint.lon;
-                    var selectedIconBtn = document.querySelector('.icon-picker-btn.is-selected');
-                    var savedIcon = selectedIconBtn ? selectedIconBtn.dataset.file : (sessionStorage.getItem(KEYS.locationIcon) || '');
 
                     var createdLocations = [];
                     try {
@@ -1076,7 +1041,7 @@
                         address: savedLocationAddress,
                         lat: savedLat,
                         lon: savedLon,
-                        icon: savedIcon
+                        icon: ''
                     });
 
                     var exists = createdLocations.some(function (entry) {
@@ -1144,7 +1109,6 @@
         bindLocationMap();
         bindServices();
         bindMaterialAdders();
-        bindIconPicker();
         bindListingTools();
         bindForm();
         bindLogout();

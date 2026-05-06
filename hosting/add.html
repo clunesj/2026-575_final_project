@@ -37,7 +37,9 @@
                             <input id="location-query" type="text" placeholder="Enter address or place for map centering" list="location-suggestions" autocomplete="off">
                             <datalist id="location-suggestions"></datalist>
                             <button id="update-location-map" class="hosting-upload-btn" type="button">Center Map</button>
+                            <button id="save-address-btn" class="hosting-upload-btn hosting-upload-btn--save" type="button">Save Address</button>
                         </div>
+                        <p id="save-address-status" class="hosting-address-status" hidden></p>
                         <div class="hosting-map-panel" aria-label="Location preview map">
                             <div id="location-preview-map" class="hosting-live-map" role="img" aria-label="Interactive preview map"></div>
                         </div>
@@ -108,14 +110,6 @@
                                 </div>
                             </div>
 
-                            <button class="hosting-tool-toggle" type="button" data-target="tool-icons">Map Display Icons</button>
-                            <div class="hosting-tool-panel" id="tool-icons" hidden>
-                                <label>Choose a map icon for your location:</label>
-                                <div class="icon-picker-grid" id="icon-picker-grid"></div>
-                                <button class="hosting-upload-btn" id="save-icon-btn" type="button">Save Icon</button>
-                                <p class="hosting-tool-preview" id="icon-preview">No icon selected yet.</p>
-                            </div>
-
                             <button class="hosting-tool-toggle" type="button" data-target="tool-contact">Public Contact Info</button>
                             <div class="hosting-tool-panel" id="tool-contact" hidden>
                                 <input id="public-contact-email" type="email" placeholder="Public email (optional)">
@@ -154,7 +148,7 @@
                         </div>
 
                         <form id="create-location-form" class="hosting-submit-row" novalidate>
-                            <button class="hosting-create-action-btn" type="submit">Save Location</button>
+                            <button class="hosting-final-submit-btn" type="submit">Add to CommonGood</button>
                         </form>
                     </article>
                 </section>

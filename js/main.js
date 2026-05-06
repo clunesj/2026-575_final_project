@@ -23,6 +23,7 @@
     // Creating leaflet map
     function mapInit() {
         handleGuestReload();
+        initWelcomeModal();
 
         map = L.map('map', {
             zoomControl: false // Remove zoom control to reposition later.
@@ -51,6 +52,7 @@
                 addUserLocations();
             })
         createNavMenu();
+        createInfoButton();
         createSearchFilter();
         createTimeFilter();
         // createRepeatFilter(); -- Nonfunctional, see createRepeatFilter() definition.
@@ -141,6 +143,17 @@
 }
 
     // ── User-created locations from sessionStorage ──────────────────────────────
+    var userStarIcon = L.divIcon({
+        className: '',
+        html: '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">' +
+              '<polygon points="17,2 21.5,13 33,13 23.5,20 27,31 17,24 7,31 10.5,20 1,13 12.5,13" ' +
+              'fill="#f5a623" stroke="#b8740a" stroke-width="1.5" stroke-linejoin="round"/>' +
+              '</svg>',
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
+        popupAnchor: [0, -18]
+    });
+
     function addUserLocations() {
         var raw;
         try {
@@ -164,7 +177,6 @@
                     Hours: entry.hours || '',
                     Link: entry.siteUrl || '',
                     Services: entry.servicesText || '',
-                    iconFile: entry.icon || '',
                     isUserCreated: true,
                     userLocationId: entry.locationId || ('legacy-' + index)
                 },
@@ -174,7 +186,10 @@
                 }
             };
 
-            locationsLayer.addData(feature);
+            var marker = L.marker([lat, lon], { icon: userStarIcon });
+            marker.properties = feature.properties;
+            marker.bindPopup(buildPopupContent(feature.properties));
+            locationsLayer.addLayer(marker);
         });
     }
 
@@ -488,6 +503,57 @@
     //
     //    map.addControl(new repeatFilter());
     //};
+
+    // ── Welcome modal ───────────────────────────────────────────────────────────
+    function initWelcomeModal() {
+        var backdrop = document.getElementById('welcome-backdrop');
+        var closeBtn = document.getElementById('welcome-close-btn');
+
+        if (!backdrop || !closeBtn) { return; }
+
+        function closeModal() {
+            backdrop.classList.add('welcome-backdrop--hidden');
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+
+        backdrop.addEventListener('click', function (e) {
+            if (e.target === backdrop) { closeModal(); }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !backdrop.classList.contains('welcome-backdrop--hidden')) {
+                closeModal();
+            }
+        });
+    }
+
+    // ── Info button (re-open welcome modal) ────────────────────────────────────
+    function createInfoButton() {
+        var infoControl = L.Control.extend({
+            options: { position: 'topright' },
+
+            onAdd: function () {
+                var btn = L.DomUtil.create('button', 'info-btn');
+                btn.type = 'button';
+                btn.setAttribute('aria-label', 'About CommonGood');
+                btn.title = 'About CommonGood';
+                btn.innerHTML = '<span aria-hidden="true">i</span>';
+
+                L.DomEvent.on(btn, 'click', function () {
+                    var backdrop = document.getElementById('welcome-backdrop');
+                    if (backdrop) {
+                        backdrop.classList.remove('welcome-backdrop--hidden');
+                    }
+                });
+
+                L.DomEvent.disableClickPropagation(btn);
+                return btn;
+            }
+        });
+
+        map.addControl(new infoControl());
+    }
 
     // ── Navigation menu (top-right hamburger) ───────────────────────────────────
     // Before login: shows only "Login".

@@ -73,29 +73,6 @@
         });
     }
 
-    function ensureGuestSeedLocation() {
-        if (accessMode !== 'guest') { return; }
-
-        var storedLocations = [];
-        try {
-            storedLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
-        } catch (error) {
-            storedLocations = [];
-        }
-
-        if (Array.isArray(storedLocations) && storedLocations.length > 0) { return; }
-
-        var seedLocation = {
-            name: 'Test Location',
-            address: '777 University Ave, Madison, WI'
-        };
-
-        sessionStorage.setItem(KEYS.createdLocation, 'true');
-        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
-        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
-        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
-    }
-
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -251,7 +228,6 @@
     }
 
     function init() {
-        ensureGuestSeedLocation();
         if (resetGuestSessionOnReload()) { return; }
         if (!enforceAccess()) { return; }
         setDashboardTitle();
