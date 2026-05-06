@@ -337,49 +337,49 @@
         locationsLayer.eachLayer(function(layer){ // Iterate through each marker on the map...
             if (!layer.properties) return; // In case a point has no properties, skip it.
             
-            // added 5/3 jc
-            var servicesRaw = layer.properties.Services || '';
-
+            // Services suggestions
+            var servicesRaw = layer.properties.Services || ''; // If a marker has a Name value, assign it to name. Otherwise, assign a blank string.
             servicesRaw.split(',').forEach(function(serviceType) {
                 var trimmed = serviceType.trim(); // remove whitespace around the tags
                 var lower = trimmed.toLowerCase();
-             // this essentially does what the other function did for name, except with services
 
-                if (lower.includes(term) && !seen[lower] && suggestions.length <5) {
+                if (lower.includes(term) && !seen[lower] && suggestions.length <5) { // If the lowercase service list includes the search term, has not been seen before, and the total number of suggestions does not exceed 5...
                     seen[lower] = true;
-                    suggestions.push(trimmed);
+                    suggestions.push({text: trimmed, isName: false}); // Push a json object, text is what displays as the suggestion, isName will control if the suggestion is italicized or not.
                 }
-
-            // uncomment this below for name search: jc
-            
-        //     var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
-
-        //     // Adding location names to suggestions
-        //     if (name.includes(term) && suggestions.length < 5) { // If the current search term is a part of the marker's name, and there are not 5 suggestions in the array...
-        //         suggestions.push(layer.properties.Name); // Add the location name to the suggestions list.
-        //     }
             });
+
+            // Location name suggestions
+            var nameRaw = layer.properties.Name || ''; // Likewise, but for location names instead of services
+            var nameLower = nameRaw.toLowerCase(); // Saves a lowercase version of the location name, matches how search filter processes inputs
+
+            if (nameLower.includes(term) && !seen[nameLower] && suggestions.length < 5) { // If the lowercase location name includes the search term, has not been seen before, and the total number of suggestions does not exceed 5...
+                seen[nameLower] = true // Adds the name to the seen list, preventing it from showing again
+                suggestions.push({text: nameRaw, isName: true}) // Similar to services suggestion, pushes as json object.
+            }
         });
 
         // Displaying suggestions when a term is searched
         if (suggestions.length > 0) {
             dropdown.style.display = 'block'; // Set the display style to block, showing the suggestions.
             
-            suggestions.forEach(function(serviceType){ // for each item in the suggestion arrayy...
-            // suggestions.forEach(function(name) { // For each item in the suggestions array
-            var item = L.DomUtil.create('div', 'suggestion-item', dropdown); // Create a new div for the suggestion
-            item.textContent = serviceType; // set content of div to the service type of the locaiton
-            // item.textContent = name; // Set the textContent of the div to the name of the location.
-            L.DomEvent.on(item, 'click', function() { // When the suggestion div is clicked...
-                input.value = serviceType;
-                // input.value = name; // Fill the search filter with the name of the location
-                // searchFilterLocations(serviceType); // same as below except with serviceType
-                // searchFilterLocations(name); // Pass the name into searchFilterLocations, narrowing the search to the one location
-                activeFilters.searchTerm =serviceType;
-                applyFilters();
-                dropdown.style.display = 'none'; // Remove the suggestions display.
+            suggestions.forEach(function(suggestion){ // for each item in the suggestion array...
+                var item = L.DomUtil.create('div', 'suggestion-item', dropdown); // Create a new div for the suggestion
+                item.textContent = suggestion.text; // set content of div to the text component of the suggestion
+
+                // Italicize location names
+                if (suggestion.isName) { // If the isName component of the suggestion is true...
+                    item.style.fontStyle = 'italic'; // Apply an inline style that makes the suggestion italicized.
+                }
+
+                // When a suggestion is clicked, fill the search bar with the item and clear suggestions
+                L.DomEvent.on(item, 'click', function() { // When the suggestion div is clicked...
+                    input.value = suggestion.text;
+                    activeFilters.searchTerm = suggestion.text;
+                    applyFilters();
+                    dropdown.style.display = 'none'; // Remove the suggestions display.
+                });
             });
-        });
         } else {
             dropdown.style.display = 'none';
         }
