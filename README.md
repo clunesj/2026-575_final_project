@@ -53,14 +53,14 @@ In addition to services community members are interested in providing, this app 
 
 Mockup features are only present to display functionality that would be usable with later cloud hosting. Mockup features cannot be interacted with. Since the project currently isn't cloud hosted, functionality is instead displayed through cache-based interactivity that dissapears upon refresh.
 
-#Mockup
+# Mockup
 
 - detailed location pages (Selected from the locaiton popups using "Details") 
 - login page (currently only set up for guest testers and has no actual login capability)
 - favoriting locations
 - location dashboard
 
-#Interactive
+# Interactive
 - editing profile
 - location creation 
 - reservation calendar
