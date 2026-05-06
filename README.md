@@ -49,6 +49,22 @@ In addition to services community members are interested in providing, this app 
 
 <img width="800" height="453" alt="image" src="https://github.com/user-attachments/assets/8d94af62-1e0c-4479-a551-60487eb3469f" />
 
+### Mockup vs. Functional Content:
+
+Mockup features are only present to display functionality that would be usable with later cloud hosting. Mockup features cannot be interacted with. Since the project currently isn't cloud hosted, functionality is instead displayed through cache-based interactivity that dissapears upon refresh.
+
+#Mockup
+
+- detailed location pages (Selected from the locaiton popups using "Details") 
+- login page (currently only set up for guest testers and has no actual login capability)
+- favoriting locations
+- location dashboard
+
+#Interactive
+- editing profile
+- location creation 
+- reservation calendar
+- event creation
 
 
 
