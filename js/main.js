@@ -29,10 +29,12 @@
         }).setView([43.08, -89.38], 13);
 
         // Add tileset
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.{ext}', {
+        L.tileLayer('https://api.thunderforest.com/transport/{z}/{x}/{y}.{ext}?apikey=848f71faa05242a78e5ca550fa29890f', {
+            // apikey: 848f71faa05242a78e5ca550fa29890f,
+        // L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.{ext}', {
             minZoom: 0,
             maxZoom: 20,
-            attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            attribution: '&copy; <a href="https://www.thundermaps.com/" target="_blank">ThunderMaps</a> &copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             ext: 'png'
         }).addTo(map);
 
