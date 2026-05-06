@@ -1,5 +1,6 @@
 // your-events.js
 (function () {
+    // These are the sessionStorage key names used to read and write event and location data on this page.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         locationName: 'commonGoodLocationName',
@@ -12,6 +13,7 @@
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
 
+    // This seeds a placeholder location into sessionStorage for guest users who have not yet created one.
     function ensureGuestSeedLocation() {
         if (accessMode !== 'guest') { return; }
 
@@ -35,6 +37,7 @@
         sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
     }
 
+    // This safely reads and parses a JSON value from sessionStorage, returning the fallback if the key is missing or invalid.
     function parseJsonFromSession(key, fallback) {
         try {
             var value = sessionStorage.getItem(key);
@@ -45,6 +48,7 @@
         }
     }
 
+    // These are date math helpers used when setting default dates for new events.
     function getWeekStart(date) {
         var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         d.setDate(d.getDate() - d.getDay());
@@ -79,6 +83,7 @@
         });
     }
 
+    // This initializes an empty events list in sessionStorage if one does not already exist.
     function ensureEventSeedData() {
         var events = parseJsonFromSession(KEYS.events, null);
         if (events) { return; }
@@ -86,6 +91,7 @@
         sessionStorage.setItem(KEYS.events, JSON.stringify([]));
     }
 
+    // This reads all events from sessionStorage, sorts them by date, and renders each one as a card on the page.
     function renderEvents() {
         var listEl = document.getElementById('events-list');
         var countEl = document.getElementById('events-count-label');
@@ -142,6 +148,7 @@
         return startA < endB && startB < endA;
     }
 
+    // This checks whether a proposed event time on a given date overlaps any scheduled break for the location.
     function isBlockedByBreak(dateIso, startHour, endHour) {
         var breaks = parseJsonFromSession(KEYS.breaks, []);
         var date = new Date(dateIso + 'T00:00:00');
@@ -158,6 +165,7 @@
         });
     }
 
+    // This wires the event creation modal with title, date, and time inputs, break conflict checking, and saving to sessionStorage.
     function bindCreateEventModal() {
         var openBtn = document.getElementById('open-create-event-modal');
         var closeBtn = document.getElementById('close-create-event-modal');
@@ -242,6 +250,7 @@
         });
     }
 
+    // This clears the guest session and redirects home if the guest user reloads the page.
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -255,6 +264,7 @@
         return false;
     }
 
+    // This redirects to the home page if not logged in, or to the location creator if no location has been saved yet.
     function enforceAccess() {
         if (!accessMode) {
             window.location.href = '/index.html';
@@ -269,6 +279,7 @@
         return true;
     }
 
+    // This runs all setup steps in order when the page finishes loading.
     function init() {
         ensureGuestSeedLocation();
         if (resetGuestSessionOnReload()) { return; }

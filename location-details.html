@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="css/style.css?v=9">
     </head>
 
+    <!-- location-details.html: shows full information for a single location, loaded from sessionStorage or the GeoJSON dataset. -->
     <body class="details-page">
         <div class="details-shell">
             <header class="details-header">
@@ -15,8 +16,10 @@
             </header>
 
             <main class="details-main">
+                <!-- Banner image section, filled by location-details.js from the location record. -->
                 <section class="details-banner" id="details-banner" aria-label="Location banner"></section>
 
+                <!-- Top row: host avatar, location name, address, and a Book Now link. -->
                 <section class="details-top-row">
                     <img id="details-host-photo" class="details-host-photo" src="img/avatar-placeholder.svg" alt="Host profile">
                     <div class="details-top-meta">
@@ -26,6 +29,7 @@
                     <a id="details-book-link" class="details-book-btn" href="#">Book Now</a>
                 </section>
 
+                <!-- Main content grid: host description card on the left, services list on the right. -->
                 <section class="details-grid">
                     <article class="details-card">
                         <h2>About the Host</h2>
@@ -41,6 +45,7 @@
                     </article>
                 </section>
 
+                <!-- Links section: website and social links, populated by location-details.js. -->
                 <section class="details-card details-extra-card">
                     <h2>Links</h2>
                     <div id="details-links-wrap"></div>

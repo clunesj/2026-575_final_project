@@ -59,6 +59,7 @@
         createZoom();
     };
 
+    // This escapes special HTML characters in a value so it is safe to insert into popup content.
     function escapeHtml(value) {
         var text = value === null || value === undefined ? '' : String(value);
         return text
@@ -69,6 +70,7 @@
             .replace(/'/g, '&#39;');
     }
 
+    // This builds the correct detail page URL for a location, using the source type and id from its properties.
     function buildDetailsUrl(properties) {
         if (!properties) {
             return 'location-details.html';
@@ -92,6 +94,7 @@
         return 'location-details.html';
     }
 
+    // This assembles the HTML string shown inside a map marker popup, including name, contact, hours, and a details link.
     function buildPopupContent(properties) {
         var name = escapeHtml(properties && properties.Name ? properties.Name : 'Community Location');
         var description = escapeHtml(properties && properties.Description ? properties.Description : 'No description available yet.');
@@ -259,6 +262,7 @@
     //     });
     // };\
 
+    // This applies the current search term and time mode filters together, showing or hiding each marker accordingly.
     function applyFilters(){
         var term = activeFilters.searchTerm.toLowerCase().trim(); // Reads the search input, saves it as a lowercase string with no whitespace
         var mode = activeFilters.timeMode;
@@ -285,6 +289,7 @@
         });
     };
 
+    // This checks whether a location is currently open based on its parsed hours and the current day and time.
     function isOpenNow(hoursParsed) { 
         if (hoursParsed === null) return true; // always show locations with unknown hours, i.e. "Check website for hours."
         var now = new Date();
@@ -299,6 +304,7 @@
         return time >= open && time < close;
     };
 
+    // This checks whether a location is open at a specific custom time string on the current day of the week.
     function isOpenAtTime(hoursParsed, timeString) {
         if (hoursParsed === null) return true; // always show locations with unknown hours, i.e. "Check website for hours."
     
@@ -336,6 +342,7 @@
     //         });
     // }
 
+    // This updates the search autocomplete dropdown with matching location names and service types as the user types.
     function updateSuggestions(searchTerm, dropdown, input) {
         var term = searchTerm.toLowerCase().trim();
         dropdown.innerHTML = ''; // Resets dropdown contents to prevent overflowing when search term changes.

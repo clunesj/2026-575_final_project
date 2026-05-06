@@ -1,5 +1,6 @@
 // reservation-calendar.js
 (function () {
+    // These are the sessionStorage key names for all calendar data including hours, bookings, events, and breaks.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         locationName: 'commonGoodLocationName',
@@ -13,6 +14,7 @@
         legacySeedCleanupDone: 'commonGoodCalendarSeedCleanupDone'
     };
 
+    // These constants control how the calendar grid is rendered, and currentWeekStart tracks which week is displayed.
     var WEEKDAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     var START_HOUR = 0;
     var END_HOUR = 24;
@@ -22,6 +24,7 @@
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
 
+    // This seeds a placeholder location for guests who have not created one yet.
     function ensureGuestSeedLocation() {
         if (accessMode !== 'guest') { return; }
 
@@ -45,6 +48,8 @@
         sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
     }
 
+    // This writes default hours, empty booking and event arrays, and an empty breaks list to sessionStorage if they do not exist.
+    // It also runs legacy cleanup to remove any old hardcoded seed entries from previous sessions.
     function ensureCalendarSeedData() {
         var storedHours = parseJsonFromSession(KEYS.calendarHours, null);
         if (!storedHours) {
@@ -91,10 +96,12 @@
         cleanupLegacySeedEntries();
     }
 
+    // This returns true if two hour ranges overlap each other.
     function overlaps(startA, endA, startB, endB) {
         return startA < endB && startB < endA;
     }
 
+    // This returns all break entries that apply to a given weekday in the currently displayed week.
     function getBreaksForWeekday(weekday) {
         var currentWeekIso = dateToIso(currentWeekStart);
         var breaks = parseJsonFromSession(KEYS.breaks, []);
@@ -106,6 +113,7 @@
         });
     }
 
+    // This checks whether a given date and time range is blocked by any scheduled break, optionally ignoring one break by id.
     function isBlockedByBreak(dateIso, startHour, endHour, ignoreBreakId) {
         var date = new Date(dateIso + 'T00:00:00');
         var weekday = date.getDay();
@@ -126,6 +134,7 @@
         });
     }
 
+    // This checks whether a proposed break on the given weekdays and week would conflict with any existing booking or event.
     function breakOverlapsExistingItems(weekdays, startHour, endHour, weekStartIso, ignoreKind, ignoreId) {
         var bookings = parseJsonFromSession(KEYS.bookings, []);
         var events = parseJsonFromSession(KEYS.events, []);
@@ -143,12 +152,14 @@
         });
     }
 
+    // This maps a schedule item kind string to the sessionStorage key that stores it.
     function getStoreKeyForKind(kind) {
         if (kind === 'booking') { return KEYS.bookings; }
         if (kind === 'event') { return KEYS.events; }
         return KEYS.breaks;
     }
 
+    // This finds a single schedule item by its kind and id from sessionStorage.
     function getItemByKindAndId(kind, id) {
         var items = parseJsonFromSession(getStoreKeyForKind(kind), []);
 
@@ -157,10 +168,12 @@
         }) || null;
     }
 
+    // This writes an updated array of items back to the correct sessionStorage key for the given kind.
     function saveItemsByKind(kind, items) {
         sessionStorage.setItem(getStoreKeyForKind(kind), JSON.stringify(items));
     }
 
+    // This collects all bookings, events, and breaks that fall within the currently displayed week and returns them sorted.
     function getWeekItems() {
         var weekStartIso = dateToIso(currentWeekStart);
         var weekEndIso = dateToIso(addDays(currentWeekStart, 6));
@@ -206,6 +219,7 @@
         return items;
     }
 
+    // This builds the management list panel showing all items for the current week with edit and delete buttons for each.
     function renderManagementList() {
         var listEl = document.getElementById('reservation-items-list');
         if (!listEl) { return; }
@@ -256,11 +270,13 @@
         });
     }
 
+    // This re-renders both the calendar grid and the management list after any data change.
     function rerenderScheduleViews() {
         renderCalendar();
         renderManagementList();
     }
 
+    // This removes old hardcoded test bookings and events that were seeded in earlier versions, running only once per session.
     function cleanupLegacySeedEntries() {
         if (sessionStorage.getItem(KEYS.legacySeedCleanupDone) === 'true') {
             return;
@@ -288,6 +304,7 @@
         sessionStorage.setItem(KEYS.legacySeedCleanupDone, 'true');
     }
 
+    // This clears the guest session and redirects home if the guest user reloads the page.
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -301,6 +318,7 @@
         return false;
     }
 
+    // This redirects to the home page if not logged in, or to the location creator if no location has been saved yet.
     function enforceAccess() {
         if (!accessMode) {
             window.location.href = '/index.html';
@@ -315,6 +333,7 @@
         return true;
     }
 
+    // This sets the calendar page title using the name of the location stored in sessionStorage.
     function setCalendarContext() {
         var titleEl = document.getElementById('reservation-calendar-title');
         var locationName = sessionStorage.getItem(KEYS.locationName) || 'Test Location';
@@ -324,6 +343,7 @@
         }
     }
 
+    // This safely reads and parses a JSON value from sessionStorage, returning the fallback if the key is missing or invalid.
     function parseJsonFromSession(key, fallback) {
         try {
             var value = sessionStorage.getItem(key);
@@ -334,6 +354,7 @@
         }
     }
 
+    // These are date helpers for getting week boundaries, adding days, and formatting dates as ISO strings.
     function getWeekStart(date) {
         var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         d.setDate(d.getDate() - d.getDay());
@@ -351,6 +372,7 @@
         return date.toISOString().slice(0, 10);
     }
 
+    // These are display formatting helpers for hours, weekday names, date ranges, and the hours summary line.
     function formatHour(hour24) {
         var suffix = hour24 >= 12 ? 'PM' : 'AM';
         var base = hour24 % 12;
@@ -408,6 +430,7 @@
         return hour;
     }
 
+    // This builds the full weekly calendar grid including time labels, day columns, break blocks, and booking or event blocks.
     function renderCalendar() {
         var weekRangeEl = document.getElementById('reservation-week-range');
         var hoursSummaryEl = document.getElementById('reservation-hours-summary');
@@ -524,6 +547,7 @@
         }
     }
 
+    // This wires the previous and next week navigation buttons to shift the displayed week and re-render the calendar.
     function bindWeekNavigation() {
         var prevBtn = document.getElementById('prev-week-btn');
         var nextBtn = document.getElementById('next-week-btn');
@@ -543,6 +567,7 @@
         }
     }
 
+    // This wires the location hours editor modal with day selection, open and close time inputs, a closed toggle, and an apply-to-all button.
     function bindHoursModal() {
         var openBtn = document.getElementById('set-location-hours-btn');
         var closeBtn = document.getElementById('close-hours-modal');
@@ -649,6 +674,7 @@
         });
     }
 
+    // This wires the new booking modal with name, date, and time inputs plus break conflict checking before saving to sessionStorage.
     function bindBookingModal() {
         var openBtn = document.getElementById('new-booking-btn');
         var closeBtn = document.getElementById('close-booking-modal');
@@ -730,6 +756,7 @@
         });
     }
 
+    // This removes a booking, event, or break from sessionStorage by kind and id, then refreshes both calendar views.
     function deleteScheduleItem(kind, id, skipConfirm) {
         if (!skipConfirm && !window.confirm('Delete this ' + kind + '?')) {
             return;
@@ -744,6 +771,7 @@
         rerenderScheduleViews();
     }
 
+    // This opens the edit modal pre-filled with the data of the selected booking, event, or break.
     function openEditScheduleItem(kind, id) {
         var backdrop = document.getElementById('edit-schedule-item-backdrop');
         var kindEl = document.getElementById('edit-schedule-item-kind');
@@ -799,6 +827,7 @@
         document.body.style.overflow = 'hidden';
     }
 
+    // This wires the edit modal's close, save, and delete buttons with full validation and conflict checking.
     function bindEditScheduleModal() {
         var backdrop = document.getElementById('edit-schedule-item-backdrop');
         var closeBtn = document.getElementById('close-edit-schedule-item');
@@ -919,6 +948,7 @@
         });
     }
 
+    // This runs all setup steps in order when the page finishes loading.
     function init() {
         ensureGuestSeedLocation();
         if (resetGuestSessionOnReload()) { return; }

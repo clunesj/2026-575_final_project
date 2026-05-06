@@ -1,5 +1,6 @@
 // add.js, by Joseph Kowalczyk, James Clunes, and Brooke Fandrich
 (function () {
+    // These are the sessionStorage key names used to store and read all location creator data across pages.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         email: 'commonGoodUserEmail',
@@ -19,15 +20,18 @@
         locationBannerPhoto: 'commonGoodLocationBannerPhoto'
     };
 
+    // This checks the URL for a mode=edit parameter so the page can behave differently when editing an existing location.
     var urlParams = new URLSearchParams(window.location.search);
     var isEditMode = urlParams.get('mode') === 'edit';
 
+    // These variables hold the Leaflet map instance, marker, active tile layer, and autocomplete debounce timer.
     var accessMode = sessionStorage.getItem(KEYS.mode);
     var locationPreviewMap;
     var locationMarker;
     var activeTileLayer;
     var autocompleteTimer;
     var MADISON_VIEWBOX = '-89.74,43.24,-89.10,42.88';
+    // This is a list of pre-written local suggestions shown in the address autocomplete dropdown before any API results arrive.
     var localLocationSuggestions = [
         'Madison, WI',
         '134 N Orchard St, Madison, WI',
@@ -57,6 +61,7 @@
         'Mount Horeb, WI'
     ];
 
+    // This safely reads and parses a JSON value from sessionStorage, returning the fallback if the key is missing or invalid.
     function parseJsonFromSession(key, fallback) {
         try {
             var value = sessionStorage.getItem(key);
@@ -67,6 +72,7 @@
         }
     }
 
+    // This updates the page title and button labels when the page is opened in edit mode.
     function setEditorModeLabels() {
         if (!isEditMode) { return; }
 
@@ -86,6 +92,7 @@
         }
     }
 
+    // This pre-fills the location name and address inputs from sessionStorage when returning to edit an existing location.
     function prefillCoreLocationInputs() {
         var locNameInput = document.getElementById('loc-name');
         var mapQueryInput = document.getElementById('location-query');
@@ -101,6 +108,7 @@
         }
     }
 
+    // This appends ", Wisconsin" to a query string if the user has not already typed a state name.
     function toWisconsinQuery(text) {
         if (/\b(wi|wisconsin)\b/i.test(text)) {
             return text;
@@ -108,6 +116,7 @@
         return text + ', Wisconsin';
     }
 
+    // This filters the local suggestion list to find entries that match what the user has typed so far.
     function getLocalSuggestionMatches(value, limit) {
         var loweredValue = value.toLowerCase().trim();
         if (!loweredValue) { return []; }
@@ -131,6 +140,7 @@
             .slice(0, limit || 5);
     }
 
+    // This abbreviates common street-type words like "avenue" to "Ave" so addresses look consistent.
     function normalizeStreetWord(word) {
         var map = {
             north: 'N',
@@ -151,6 +161,7 @@
         return map[lower] || word;
     }
 
+    // This converts a full state name like "wisconsin" into its two-letter abbreviation.
     function toStateCode(stateValue) {
         if (!stateValue) { return ''; }
 
@@ -163,6 +174,7 @@
         return stateValue;
     }
 
+    // This builds a short human-readable address string from a Nominatim geocode result object.
     function toShortAddress(result) {
         var addr = result && result.address ? result.address : {};
         var house = addr.house_number || '';
@@ -189,6 +201,7 @@
         return left || result.display_name || '';
     }
 
+    // This normalizes a road text string to lowercase with common abbreviations so two addresses can be compared reliably.
     function normalizeRoadText(value) {
         if (!value) { return ''; }
 
@@ -207,6 +220,7 @@
             .trim();
     }
 
+    // This scores multiple geocode results and returns the one that best matches the user's typed query.
     function chooseBestGeocodeResult(query, results) {
         if (!results || !results.length) {
             return null;
@@ -252,6 +266,7 @@
         return scored[0].item;
     }
 
+    // This clears the guest session and redirects to the home page if the guest user reloads the page.
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -265,12 +280,14 @@
         return false;
     }
 
+    // This redirects to the home page if there is no active session.
     function enforceAccess() {
         if (!accessMode) {
             window.location.href = '/index.html';
         }
     }
 
+    // This updates the header badge to show guest mode or the signed-in email.
     function updateSessionBadge() {
         var badge = document.getElementById('session-badge');
         if (!badge) { return; }
@@ -283,6 +300,7 @@
         }
     }
 
+    // This fills the host name and avatar in the listing preview area from sessionStorage.
     function loadHostInfo() {
         var nameEl = document.getElementById('listing-name');
         var avatarEl = document.getElementById('listing-avatar');
@@ -302,6 +320,7 @@
         }
     }
 
+    // This wires the banner photo upload button to open a file picker and save the image to sessionStorage.
     function bindBannerUpload() {
         var zone = document.getElementById('banner-upload-zone');
         var button = document.getElementById('banner-upload-btn');
@@ -341,6 +360,7 @@
         });
     }
 
+    // This wires the profile photo upload button to open a file picker and update both the preview and sessionStorage.
     function bindProfilePhotoUpload() {
         var button = document.getElementById('profile-photo-upload-btn');
         var input = document.getElementById('profile-photo-input');
@@ -369,12 +389,14 @@
         });
     }
 
+    // This generates a unique location ID from the name and the current timestamp.
     function makeLocationId(name) {
         var source = (name || 'location').toLowerCase();
         var slug = source.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
         return 'loc-' + (slug || 'item') + '-' + Date.now();
     }
 
+    // This reads the public contact info from sessionStorage and formats it as a single display string.
     function buildContactLine() {
         var contact = parseJsonFromSession(KEYS.publicContactInfo, {});
         var parts = [];
@@ -392,6 +414,7 @@
         return parts.join(' | ');
     }
 
+    // This assembles a complete location record object from all the data currently stored in sessionStorage.
     function buildLocationRecord(options) {
         var services = parseJsonFromSession(KEYS.locationServices, []);
         var socialLinks = parseJsonFromSession(KEYS.socialLinks, []);
@@ -419,6 +442,7 @@
         };
     }
 
+    // This moves the map and repositions the marker to the given latitude and longitude.
     function setMapLocation(lat, lon, label) {
         if (!locationPreviewMap) { return; }
 
@@ -435,6 +459,7 @@
         }
     }
 
+    // This loads the Stadia tile layer and switches to OpenStreetMap after a short delay as a fallback.
     function addBaseTilesWithFallback(mapInstance) {
         var switchedToFallback = false;
 
@@ -473,7 +498,7 @@
         }, 2500);
     }
 
-    // Mirrors the landing page map setup in main.js (center, tile source, zoom control position).
+    // This initializes the Leaflet preview map inside the location creator and centers it on Madison.
     function initLocationPreviewMap() {
         var mapEl = document.getElementById('location-preview-map');
 
@@ -515,6 +540,7 @@
         return true;
     }
 
+    // This sends an address query to the Nominatim geocoding API and returns the raw results.
     function geocodeAddress(query, resultLimit) {
         if (!query) {
             return Promise.resolve([]);
@@ -531,6 +557,7 @@
         });
     }
 
+    // This geocodes an address string, picks the best result, and moves the map to that location.
     function geocodeAndCenter(query) {
         if (!query) { return Promise.resolve(null); }
 
@@ -568,6 +595,7 @@
 
         if (!initLocationPreviewMap()) { return; }
 
+        // This wires the Save Address button to geocode the address, move the map, and write the result to sessionStorage.
         var saveAddressBtn = document.getElementById('save-address-btn');
         var saveAddressStatus = document.getElementById('save-address-status');
 
@@ -671,6 +699,7 @@
         });
     }
 
+    // This wires the service add button so the host can attach named services with optional images to the location.
     function bindServices() {
         var addButton = document.getElementById('add-service-btn');
         var nameInput = document.getElementById('service-name');
@@ -758,6 +787,7 @@
         });
     }
 
+    // This wires the plus buttons for the host-provided and guest-provided materials lists.
     function bindMaterialAdders() {
         var addHost = document.getElementById('add-host-material');
         var addGuest = document.getElementById('add-guest-material');
@@ -808,6 +838,7 @@
         });
     }
 
+    // This wires all the accordion tool panels including description, social links, QR code, and contact info.
     function bindListingTools() {
         var toggles = document.querySelectorAll('.hosting-tool-toggle[data-target]');
         var descriptionInput = document.getElementById('location-page-description');
@@ -971,6 +1002,7 @@
         }
     }
 
+    // This handles the main form submission, geocodes the address, builds the location record, and saves it to sessionStorage.
     function bindForm() {
         var form = document.getElementById('create-location-form');
         if (!form) { return; }
@@ -1086,6 +1118,7 @@
         });
     }
 
+    // This clears the access mode and email from sessionStorage when the user clicks the logout link.
     function bindLogout() {
         var logoutLink = document.getElementById('logout-link');
         if (!logoutLink) { return; }
@@ -1096,6 +1129,7 @@
         });
     }
 
+    // This runs all setup steps in the correct order when the page finishes loading.
     function init() {
         if (resetGuestSessionOnReload()) { return; }
 

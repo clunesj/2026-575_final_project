@@ -1,5 +1,6 @@
 // login.js, by Joseph Kowalczyk, James Clunes, and Brooke Fandrich
 (function() {
+    // These are the sessionStorage key names used to store login state and location data across pages.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         locationName: 'commonGoodLocationName',
@@ -8,6 +9,7 @@
         createdLocations: 'commonGoodCreatedLocations'
     };
 
+    // This writes a placeholder location into sessionStorage so guest users have a location to browse.
     function seedGuestTestLocation() {
         var seedLocation = {
             name: 'Test Location',
@@ -20,6 +22,7 @@
         sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
     }
 
+    // This saves the access mode and optional email to sessionStorage, then navigates to the map page.
     function continueToMap(mode, emailValue) {
         sessionStorage.setItem(KEYS.mode, mode);
 
@@ -32,6 +35,7 @@
         window.location.href = 'index.html';
     }
 
+    // This attaches event handlers to the login form and the guest entry button.
     function bindLoginFlow() {
         var loginForm = document.getElementById('login-form');
         var guestButton = document.getElementById('guest-login');
@@ -41,11 +45,13 @@
             return;
         }
 
+        // When the login form is submitted, store the email and mark the session as authenticated.
         loginForm.addEventListener('submit', function(event) {
             event.preventDefault();
             continueToMap('authenticated', emailInput.value.trim());
         });
 
+        // When the guest button is clicked, clear any old session data, seed a placeholder location, and enter guest mode.
         guestButton.addEventListener('click', function() {
             sessionStorage.clear();
             seedGuestTestLocation();

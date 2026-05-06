@@ -7,8 +7,10 @@
         <link rel="stylesheet" href="../css/style.css?v=8">
     </head>
 
+    <!-- host-dashboard.html: the main control panel for a host, showing stats, quick actions, and a break scheduling modal. -->
     <body class="hosting-dashboard-page">
         <div class="hosting-dashboard-layout">
+            <!-- Left sidebar: hosting section navigation links. -->
             <aside class="hosting-dashboard-sidebar" aria-label="Hosting navigation">
                 <h2 class="hosting-dashboard-brand">HOSTING:</h2>
                 <nav class="hosting-dashboard-nav">
@@ -20,11 +22,13 @@
             </aside>
 
             <main class="hosting-dashboard-main">
+                <!-- Page header showing the location name and a back-to-map link. -->
                 <header class="hosting-dashboard-header">
                     <h1 id="hosting-dashboard-title">Your Location Dashboard</h1>
                     <a class="hosting-back-map-btn" href="../index.html">Back to Map</a>
                 </header>
 
+                <!-- Stat cards showing booking counts, guest totals, events, and current occupancy. -->
                 <section class="hosting-dashboard-stats" aria-label="Location status cards">
                     <article class="hosting-stat-card">
                         <p class="hosting-stat-value">0</p>
@@ -44,6 +48,7 @@
                     </article>
                 </section>
 
+                <!-- Action panel and notifications panel shown side by side below the stats. -->
                 <section class="hosting-dashboard-panels" aria-label="Dashboard controls and updates">
                     <article class="hosting-panel hosting-panel-actions">
                         <div class="hosting-panel-actions-row">
@@ -68,6 +73,7 @@
             </main>
         </div>
 
+        <!-- Break scheduling modal: day picker, time range, week selector, and reason textarea. -->
         <div class="hosting-modal-backdrop" id="event-modal-backdrop" hidden>
             <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="event-modal-title">
                 <button class="hosting-modal-close" id="close-event-modal" type="button" aria-label="Close modal">x</button>
