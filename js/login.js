@@ -2,24 +2,7 @@
 (function() {
     // These are the sessionStorage key names used to store login state and location data across pages.
     var KEYS = {
-        mode: 'commonGoodAccessMode',
-        locationName: 'commonGoodLocationName',
-        locationAddress: 'commonGoodLocationAddress',
-        createdLocation: 'commonGoodHasCreatedLocation',
-        createdLocations: 'commonGoodCreatedLocations'
-    };
-
-    // This writes a placeholder location into sessionStorage so guest users have a location to browse.
-    function seedGuestTestLocation() {
-        var seedLocation = {
-            name: 'Test Location',
-            address: '777 University Ave, Madison, WI'
-        };
-
-        sessionStorage.setItem(KEYS.createdLocation, 'true');
-        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
-        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
-        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
+        mode: 'commonGoodAccessMode'
     }
 
     // This saves the access mode and optional email to sessionStorage, then navigates to the map page.
@@ -51,10 +34,9 @@
             continueToMap('authenticated', emailInput.value.trim());
         });
 
-        // When the guest button is clicked, clear any old session data, seed a placeholder location, and enter guest mode.
+        // When the guest button is clicked, clear any old session data and enter guest mode.
         guestButton.addEventListener('click', function() {
             sessionStorage.clear();
-            seedGuestTestLocation();
             continueToMap('guest');
         });
     }

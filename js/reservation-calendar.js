@@ -24,28 +24,28 @@
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
 
-    // This seeds a placeholder location for guests who have not created one yet.
-    function ensureGuestSeedLocation() {
-        if (accessMode !== 'guest') { return; }
-
-        var storedLocations = [];
+    // This removes legacy placeholder data if old sessions still contain the hardcoded Test Location.
+    function purgeSeedLocation() {
+        var raw;
         try {
-            storedLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
-        } catch (error) {
-            storedLocations = [];
+            raw = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
+        } catch (e) {
+            raw = [];
         }
 
-        if (Array.isArray(storedLocations) && storedLocations.length > 0) { return; }
+        var filtered = raw.filter(function (entry) {
+            var name = typeof entry === 'string' ? entry : (entry && entry.name ? entry.name : '');
+            return name !== 'Test Location';
+        });
 
-        var seedLocation = {
-            name: 'Test Location',
-            address: '777 University Ave, Madison, WI'
-        };
-
-        sessionStorage.setItem(KEYS.createdLocation, 'true');
-        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
-        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
-        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
+        if (filtered.length !== raw.length) {
+            sessionStorage.setItem(KEYS.createdLocations, JSON.stringify(filtered));
+            if (filtered.length === 0) {
+                sessionStorage.removeItem(KEYS.createdLocation);
+                sessionStorage.removeItem(KEYS.locationName);
+                sessionStorage.removeItem(KEYS.locationAddress);
+            }
+        }
     }
 
     // This writes default hours, empty booking and event arrays, and an empty breaks list to sessionStorage if they do not exist.
@@ -336,7 +336,7 @@
     // This sets the calendar page title using the name of the location stored in sessionStorage.
     function setCalendarContext() {
         var titleEl = document.getElementById('reservation-calendar-title');
-        var locationName = sessionStorage.getItem(KEYS.locationName) || 'Test Location';
+        var locationName = sessionStorage.getItem(KEYS.locationName) || 'Selected Location';
 
         if (titleEl) {
             titleEl.textContent = locationName + ' Reservation Calendar';
@@ -950,7 +950,7 @@
 
     // This runs all setup steps in order when the page finishes loading.
     function init() {
-        ensureGuestSeedLocation();
+        purgeSeedLocation();
         if (resetGuestSessionOnReload()) { return; }
         if (!enforceAccess()) { return; }
         ensureCalendarSeedData();

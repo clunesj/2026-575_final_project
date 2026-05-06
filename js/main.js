@@ -132,7 +132,7 @@
                         iconAnchor: [18, 36], // Position on icon that represents the location
                         popupAnchor: [0, -36] // Position realtive to anchor that the popup originates from.
                     });
-                    return L.marker(latlng);
+                    return L.marker(latlng, { icon: customIcon });
                 }
                 return L.marker(latlng);
             },
