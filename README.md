@@ -59,6 +59,7 @@ Mockup features are only present to display functionality that would be usable w
 - login page (currently only set up for guest testers and has no actual login capability)
 - favoriting locations
 - location dashboard
+- Details Page booking feature
 
 # Interactive
 - editing profile
