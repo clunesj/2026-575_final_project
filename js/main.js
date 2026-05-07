@@ -735,7 +735,7 @@
                 if (accessMode) {
                     // Logged-in or guest tester: show app navigation
                     content.innerHTML =
-                        '<p><a href="hosting/location.html">Locations</a></p>' +
+                        '<p><a href="hosting/location/">Locations</a></p>' +
                         '<p><a href="profile.html">Profile</a></p>' +
                         '<p><a href="#" id="logout-nav-link">Logout</a></p>';
 

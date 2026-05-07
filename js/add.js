@@ -273,7 +273,7 @@
 
         if (accessMode === 'guest' && navType === 'reload') {
             sessionStorage.clear();
-            window.location.href = '../index.html';
+            window.location.href = '../';
             return true;
         }
 
@@ -283,7 +283,7 @@
     // This redirects to the home page if there is no active session.
     function enforceAccess() {
         if (!accessMode) {
-            window.location.href = '../index.html';
+            window.location.href = '../';
         }
     }
 
@@ -1113,7 +1113,7 @@
                     sessionStorage.setItem(KEYS.createdLocations, JSON.stringify(createdLocations));
 
                     alert(isEditMode ? 'Location updated!' : 'Location saved! Opening your hosting dashboard preview.');
-                    window.location.href = 'host-dashboard.html';
+                    window.location.href = 'host-dashboard/';
                 });
         });
     }

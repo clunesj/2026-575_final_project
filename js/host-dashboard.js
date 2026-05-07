@@ -88,7 +88,7 @@
 
         if (accessMode === 'guest' && navType === 'reload') {
             sessionStorage.clear();
-            window.location.href = '../index.html';
+            window.location.href = '../';
             return true;
         }
 
@@ -98,12 +98,12 @@
     // This redirects to the home page if not logged in, or to the location creator if no location has been saved yet.
     function enforceAccess() {
         if (!accessMode) {
-            window.location.href = '../index.html';
+            window.location.href = '../';
             return false;
         }
 
         if (sessionStorage.getItem(KEYS.createdLocation) !== 'true') {
-            window.location.href = 'add.html';
+            window.location.href = 'add/';
             return false;
         }
 
