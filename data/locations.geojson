@@ -20,6 +20,8 @@
         "Hours": "Check website for current open shop hours",
         "Link": "https://freewheelbikes.org",
         "Services": "Bike Repair, Bike Donation, Tool Lending, DIY Mechanics, Transportation Access, Walk-In, For Kids",
+        "Category": "Bicycle Access",
+        "iconFile": "bicycle.svg",
         "HoursParsed": null
       },
       "geometry": {
@@ -39,9 +41,11 @@
         "Longitude": -89.40340562,
         "Description": "A drive-up food pantry providing fresh produce, meat, dairy, dry goods, personal care items, and emergency financial assistance to those in need.",
         "Contact": "1 (608) 257-0919",
-        "Hours": "Mon-Tue & Fri: 10:30 AM-2:30 PM; Thu: 2:30-6:00 PM; Wed, Sat, Sun: Closed",
+        "Hours": "Mon–Tue & Fri: 10:30 AM–2:30 PM; Thu: 2:30–6:00 PM; Wed, Sat, Sun: Closed",
         "Link": "https://svdpmadison.org/program/food-pantry/",
         "Services": "Food Pantry, Fresh Produce, Meat & Dairy, Dry Goods, Personal Care Items, Pet Food, Emergency Food, Hunger Relief, Rent Assistance, Utility Assistance, Bus Fare, Walk-In",
+        "Category": "Food",
+        "iconFile": "restaurant.svg",
         "HoursParsed": [
           [
             1030,
@@ -81,9 +85,11 @@
         "Longitude": -89.29586235,
         "Description": "A regional food bank hub that distributes food to partner pantries and organizations across southern Wisconsin to address hunger in the community.",
         "Contact": "1 (608) 223-9121",
-        "Hours": "Mon-Thu: 8:00 AM-4:30 PM; Fri: 8:00 AM-4:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Thu: 8:00 AM–4:30 PM; Fri: 8:00 AM–4:00 PM; Sat–Sun: Closed",
         "Link": "https://www.secondharvestsw.org/",
         "Services": "Food Pantry, Fresh Produce, Dry Goods, Hunger Relief, Emergency Food",
+        "Category": "Food",
+        "iconFile": "restaurant.svg",
         "HoursParsed": [
           [
             800,
@@ -126,9 +132,11 @@
         "Longitude": -89.40379402,
         "Description": "A welcoming community center offering a food pantry, social services, youth programs, and other resources to support diverse families in the Madison area.",
         "Contact": "1 (608) 255-5337",
-        "Hours": "Mon, Wed-Thu: 9:30 AM-9:00 PM; Tue: 9:30 AM-8:00 PM; Fri: 9:30 AM-6:00 PM; Sun: 10:00 AM-12:00 PM; Sat: Closed",
+        "Hours": "Mon, Wed–Thu: 9:30 AM–9:00 PM; Tue: 9:30 AM–8:00 PM; Fri: 9:30 AM–6:00 PM; Sun: 10:00 AM–12:00 PM; Sat: Closed",
         "Link": "http://www.neighborhoodhousemadison.org/",
         "Services": "Food Pantry, Fresh Produce, Meat & Dairy, Dry Goods, Hunger Relief, Community Programs, For Kids",
+        "Category": "Food",
+        "iconFile": "restaurant.svg",
         "HoursParsed": [
           [
             930,
@@ -174,9 +182,11 @@
         "Longitude": -89.39447724,
         "Description": "A south Madison library branch offering free WiFi, books, programs, seed lending, and community resources in an accessible neighborhood location.",
         "Contact": "1 (608) 266-6395",
-        "Hours": "Mon-Fri: 10:00 AM-8:00 PM; Sat: 9:00 AM-5:00 PM; Sun: Closed",
+        "Hours": "Mon–Fri: 10:00 AM–8:00 PM; Sat: 9:00 AM–5:00 PM; Sun: Closed",
         "Link": "http://www.madisonpubliclibrary.org/goodman-south",
         "Services": "Free WiFi, Computer Access, Study Space, Printing, Community Programs, Media Lending, Seed Library, Walk-In, For Kids",
+        "Category": "Library",
+        "iconFile": "library.svg",
         "HoursParsed": [
           [
             1000,
@@ -222,9 +232,11 @@
         "Longitude": -89.38735887,
         "Description": "The main Madison Public Library branch, offering WiFi, an extensive book collection, community programs, kids' play areas, and access to all branch services.",
         "Contact": "1 (608) 266-6300",
-        "Hours": "Mon-Thu: 9:00 AM-9:00 PM; Fri: 9:00 AM-6:00 PM; Sat: 9:00 AM-5:00 PM; Sun: 1:00-5:00 PM",
+        "Hours": "Mon–Thu: 9:00 AM–9:00 PM; Fri: 9:00 AM–6:00 PM; Sat: 9:00 AM–5:00 PM; Sun: 1:00–5:00 PM",
         "Link": "https://www.madisonpubliclibrary.org/central",
         "Services": "Free WiFi, Computer Access, Study Space, Printing, Community Programs, Media Lending, Walk-In, For Kids",
+        "Category": "Library",
+        "iconFile": "library.svg",
         "HoursParsed": [
           [
             900,
@@ -251,7 +263,7 @@
             1700
           ],
           [
-            100,
+            1300,
             1700
           ]
         ]
@@ -271,11 +283,13 @@
         "Name": "Monona Public Library",
         "Latitude": 43.0627934,
         "Longitude": -89.34078763,
-        "Description": "A highly rated public library in Monona with free WiFi, study rooms, a fireplace lounge, and a scenic park view \u2014 open seven days a week.",
+        "Description": "A highly rated public library in Monona with free WiFi, study rooms, a fireplace lounge, and a scenic park view — open seven days a week.",
         "Contact": "1 (608) 224-7100",
-        "Hours": "Mon-Wed: 9:00 AM-8:00 PM; Thu-Fri: 9:00 AM-6:00 PM; Sat: 9:00 AM-5:00 PM; Sun: 1:00-5:00 PM",
+        "Hours": "Mon–Wed: 9:00 AM–8:00 PM; Thu–Fri: 9:00 AM–6:00 PM; Sat: 9:00 AM–5:00 PM; Sun: 1:00–5:00 PM",
         "Link": "https://www.cityofmonona.com/government/departments/library",
         "Services": "Free WiFi, Computer Access, Study Space, Printing, Community Programs, Media Lending, Walk-In, For Kids",
+        "Category": "Library",
+        "iconFile": "library.svg",
         "HoursParsed": [
           [
             900,
@@ -302,7 +316,7 @@
             1700
           ],
           [
-            100,
+            1300,
             1700
           ]
         ]
@@ -324,9 +338,11 @@
         "Longitude": -89.31787662,
         "Description": "A well-loved east Madison library branch offering free WiFi, a large collection, children's programming, and emergency bike repair tools outside.",
         "Contact": "1 (608) 224-7100",
-        "Hours": "Mon-Fri: 9:00 AM-9:00 PM; Sat: 9:00 AM-5:00 PM; Sun: Closed",
+        "Hours": "Mon–Fri: 9:00 AM–9:00 PM; Sat: 9:00 AM–5:00 PM; Sun: Closed",
         "Link": "https://www.madisonpubliclibrary.org/pinney",
         "Services": "Free WiFi, Computer Access, Study Space, Printing, Community Programs, Media Lending, Bike Repair, Walk-In, For Kids",
+        "Category": "Library",
+        "iconFile": "library.svg",
         "HoursParsed": [
           [
             900,
@@ -372,9 +388,11 @@
         "Longitude": -89.33399328,
         "Description": "A beloved community bike shop selling affordable refurbished bikes with warranties, offering expert tune-ups and encouraging bike donations for a second life.",
         "Contact": "1 (608) 451-3403",
-        "Hours": "Tue, Fri-Sat: 10:30 AM-5:00 PM; Wed-Thu: 10:30 AM-3:30 PM; Mon & Sun: Closed",
+        "Hours": "Tue, Fri–Sat: 10:30 AM–5:00 PM; Wed–Thu: 10:30 AM–3:30 PM; Mon & Sun: Closed",
         "Link": "https://www.facebook.com/thebicyclerecycle",
         "Services": "Bike Repair, Bike Donation, Transportation Access",
+        "Category": "Bicycle Access",
+        "iconFile": "bicycle.svg",
         "HoursParsed": [
           null,
           [
@@ -417,9 +435,11 @@
         "Longitude": -89.37235827,
         "Description": "A nonprofit that provides free and low-cost refurbished bikes to children and adults in financial need, while also offering quality used bikes and repairs to the public.",
         "Contact": "1 (608) 405-0385",
-        "Hours": "Mon-Thu: 10:00 AM-5:00 PM; Fri: 10:00 AM-4:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Thu: 10:00 AM–5:00 PM; Fri: 10:00 AM–4:00 PM; Sat–Sun: Closed",
         "Link": "https://bikesforkidswisconsin.org",
         "Services": "Bike Repair, Bike Donation, Transportation Access, For Kids",
+        "Category": "Bicycle Access",
+        "iconFile": "bicycle.svg",
         "HoursParsed": [
           [
             1000,
@@ -465,6 +485,8 @@
         "Hours": "Open 24 hours",
         "Link": "https://www.cityofmadison.com/parks/find-a-park/facility?id=1178",
         "Services": "Plot Rental, Fresh Produce, Urban Farming, Outdoor Space",
+        "Category": "Garden",
+        "iconFile": "garden_centre.svg",
         "HoursParsed": [
           [
             0,
@@ -513,9 +535,11 @@
         "Longitude": -89.39602478,
         "Description": "A membership-based community garden near Brittingham Park where residents can rent plots to grow produce in a beautiful shared green space.",
         "Contact": "1 (608) 266-4711",
-        "Hours": "Daily: 4:00 AM-10:00 PM",
+        "Hours": "Daily: 4:00 AM–10:00 PM",
         "Link": "https://www.cityofmadison.com/parks/find-a-park/facility?id=1170",
         "Services": "Plot Rental, Fresh Produce, Urban Farming, Outdoor Space",
+        "Category": "Garden",
+        "iconFile": "garden_centre.svg",
         "HoursParsed": [
           [
             400,
@@ -563,10 +587,12 @@
         "Latitude": 43.08034552,
         "Longitude": -89.37899262,
         "Description": "A city-run community garden on the east side of Madison where residents can lease plots to grow their own fruits, vegetables, and herbs.",
-        "Contact": "None, check website.",
+        "Contact": "Not listed",
         "Hours": "Check with City of Madison Parks",
         "Link": "https://www.cityofmadison.com/parks",
         "Services": "Plot Rental, Fresh Produce, Urban Farming, Outdoor Space",
+        "Category": "Garden",
+        "iconFile": "garden_centre.svg",
         "HoursParsed": null
       },
       "geometry": {
@@ -589,6 +615,8 @@
         "Hours": "Open 24 hours",
         "Link": "https://wisconsinfoodforests.com",
         "Services": "Food Forest, Fresh Produce, Urban Farming, Volunteer Gardening, Outdoor Space",
+        "Category": "Garden",
+        "iconFile": "garden_centre.svg",
         "HoursParsed": [
           [
             0,
@@ -636,10 +664,12 @@
         "Latitude": 43.10110968,
         "Longitude": -89.33480962,
         "Description": "A community garden on Madison's north side offering plot rentals to local residents for growing vegetables and building neighborhood connections.",
-        "Contact": "None, check website.",
+        "Contact": "Not listed",
         "Hours": "Check with City of Madison Parks",
         "Link": "https://www.cityofmadison.com/parks",
         "Services": "Plot Rental, Fresh Produce, Urban Farming, Outdoor Space",
+        "Category": "Garden",
+        "iconFile": "garden_centre.svg",
         "HoursParsed": null
       },
       "geometry": {
@@ -662,6 +692,8 @@
         "Hours": "Check with City of Madison Parks",
         "Link": "https://www.cityofmadison.com/parks",
         "Services": "Plot Rental, Fresh Produce, Urban Farming, Outdoor Space",
+        "Category": "Garden",
+        "iconFile": "garden_centre.svg",
         "HoursParsed": null
       },
       "geometry": {
@@ -681,9 +713,11 @@
         "Longitude": -89.37792838,
         "Description": "A day resource center for people experiencing homelessness in Madison, providing showers, case management, Medicaid navigation, and pathways to permanent housing.",
         "Contact": "1 (608) 826-8040",
-        "Hours": "Daily: 8:00 AM-5:00 PM",
+        "Hours": "Daily: 8:00 AM–5:00 PM",
         "Link": "https://thebeaconhelps.org",
         "Services": "Day Shelter, Showers, Case Management, Housing Navigation, Medicaid Enrollment, Walk-In",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": [
           [
             800,
@@ -732,9 +766,11 @@
         "Longitude": -89.37863197,
         "Description": "A nonprofit providing emergency shelter, transitional housing, and supportive services to help adults experiencing homelessness in the Madison area.",
         "Contact": "1 (608) 257-2534",
-        "Hours": "Mon-Fri: 8:00 AM-4:30 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 8:00 AM–4:30 PM; Sat–Sun: Closed",
         "Link": "https://porchlightinc.org",
         "Services": "Emergency Shelter, Transitional Housing, Case Management, Housing Navigation",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": [
           [
             800,
@@ -780,6 +816,8 @@
         "Hours": "Open 24 hours",
         "Link": "https://ywcamadison.org",
         "Services": "Transitional Housing, Emergency Shelter, Case Management",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": [
           [
             0,
@@ -828,9 +866,11 @@
         "Longitude": -89.39761347,
         "Description": "A nonprofit offering case management, housing navigation, and supportive services to help individuals and families in Dane County move out of homelessness.",
         "Contact": "1 (608) 294-7998",
-        "Hours": "Mon-Fri: 8:30 AM-4:30 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 8:30 AM–4:30 PM; Sat–Sun: Closed",
         "Link": "https://trhome.org",
         "Services": "Emergency Shelter, Transitional Housing, Case Management, Housing Navigation, For Kids",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": [
           [
             830,
@@ -873,9 +913,11 @@
         "Longitude": -89.31589667,
         "Description": "A Porchlight-operated shelter providing housing support and case management services for adults experiencing homelessness in the Madison area.",
         "Contact": "1 (608) 241-9447",
-        "Hours": "Mon-Sun: 8:30 AM-5:00 PM",
+        "Hours": "Mon–Sun: 8:30 AM–5:00 PM",
         "Link": "https://porchlightinc.org",
         "Services": "Emergency Shelter, Case Management, Housing Navigation",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": [
           [
             830,
@@ -924,9 +966,11 @@
         "Longitude": -89.30103773,
         "Description": "A Porchlight-operated overnight emergency shelter for adult men, providing beds, meals, and showers on a nightly drop-in basis.",
         "Contact": "1 (608) 416-1446",
-        "Hours": "Daily: 4:30 PM-8:00 AM",
+        "Hours": "Daily: 4:30 PM–8:00 AM",
         "Link": "https://porchlightinc.org",
         "Services": "Emergency Shelter, Overnight Stay, Showers, Walk-In",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": [
           [
             1630,
@@ -978,6 +1022,8 @@
         "Hours": "Check website for current hours",
         "Link": "http://endabusewi.org/",
         "Services": "Domestic Violence Support, Case Management, Housing Navigation",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": null
       },
       "geometry": {
@@ -995,11 +1041,13 @@
         "Name": "Tenney Preschool and Childcare",
         "Latitude": 43.08863119,
         "Longitude": -89.36617765,
-        "Description": "A parent cooperative preschool offering nature-based early childhood education and childcare for children ages 2-5 in a warm, community-oriented environment.",
+        "Description": "A parent cooperative preschool offering nature-based early childhood education and childcare for children ages 2–5 in a warm, community-oriented environment.",
         "Contact": "1 (608) 255-3250",
-        "Hours": "Mon-Fri: 7:30 AM-5:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 7:30 AM–5:00 PM; Sat–Sun: Closed",
         "Link": "http://tenneykids.org/",
         "Services": "Preschool, After-School Care, Nature Education, For Kids",
+        "Category": "Childcare",
+        "iconFile": "social_facility.svg",
         "HoursParsed": [
           [
             730,
@@ -1042,9 +1090,11 @@
         "Longitude": -89.43574662,
         "Description": "A home-away-from-home near UW Hospital providing free or low-cost lodging, meals, and support for families with children receiving medical treatment.",
         "Contact": "1 (608) 232-4660",
-        "Hours": "Mon-Fri: 8:00 AM-9:00 PM; Sat-Sun: 9:00 AM-9:00 PM",
+        "Hours": "Mon–Fri: 8:00 AM–9:00 PM; Sat–Sun: 9:00 AM–9:00 PM",
         "Link": "http://www.rmhcmadison.org/",
         "Services": "Lodging Near Hospital, Meal Support, Family Housing, For Kids",
+        "Category": "Housing",
+        "iconFile": "hotel.svg",
         "HoursParsed": [
           [
             800,
@@ -1096,6 +1146,8 @@
         "Hours": "Check website for member open hours",
         "Link": "http://www.thebodgery.org/",
         "Services": "Woodworking, Laser Cutting, Metalworking, Screen Printing, Tool Access, Workshops",
+        "Category": "Crafting",
+        "iconFile": "trade.svg",
         "HoursParsed": null
       },
       "geometry": {
@@ -1115,9 +1167,11 @@
         "Longitude": -89.40667335,
         "Description": "A licensed childcare center operated by SSM Health, providing weekday care for infants and young children near the hospital campus.",
         "Contact": "1 (608) 255-4880",
-        "Hours": "Mon-Fri: 6:30 AM-5:30 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 6:30 AM–5:30 PM; Sat–Sun: Closed",
         "Link": "https://www.ssmhealth.com/locations/child-care-center",
         "Services": "Preschool, Infant Care, For Kids",
+        "Category": "Childcare",
+        "iconFile": "social_facility.svg",
         "HoursParsed": [
           [
             630,
@@ -1159,10 +1213,12 @@
         "Latitude": 43.03026247,
         "Longitude": -89.44962208,
         "Description": "An outdoor nature-based preschool and after-school program in Madison that emphasizes hands-on exploration, play, and learning in natural environments.",
-        "Contact": "None, check website.",
-        "Hours": "Mon-Fri: 9:00 AM-5:30 PM; Sat-Sun: Closed",
+        "Contact": "Not listed",
+        "Hours": "Mon–Fri: 9:00 AM–5:30 PM; Sat–Sun: Closed",
         "Link": "https://sproutsnatureschool.com/",
         "Services": "Preschool, After-School Care, Nature Education, Summer Camp, For Kids",
+        "Category": "Childcare",
+        "iconFile": "social_facility.svg",
         "HoursParsed": [
           [
             900,
@@ -1205,9 +1261,11 @@
         "Longitude": -89.39143781,
         "Description": "A locally trusted equipment rental and supply shop offering a wide range of contractor and DIY tools with knowledgeable, hands-on customer service.",
         "Contact": "1 (608) 257-2349",
-        "Hours": "Mon-Fri: 7:00 AM-5:00 PM; Sat: 8:00-10:00 AM; Sun: Closed",
+        "Hours": "Mon–Fri: 7:00 AM–5:00 PM; Sat: 8:00–10:00 AM; Sun: Closed",
         "Link": "http://www.badgercontractorsrental.com/",
         "Services": "Equipment Rental, Contractor Supply, DIY Tools, Tool Access",
+        "Category": "Tool Rental",
+        "iconFile": "diy.svg",
         "HoursParsed": [
           [
             700,
@@ -1253,9 +1311,11 @@
         "Longitude": -89.31116073,
         "Description": "A social services agency providing emergency financial assistance, free clothing, housing support, and resources to low-income individuals and families in the region.",
         "Contact": "1 (608) 237-1255",
-        "Hours": "Mon-Fri: 9:00 AM-3:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 9:00 AM–3:00 PM; Sat–Sun: Closed",
         "Link": "https://www.cacscw.org/",
         "Services": "Emergency Financial Assistance, Rent Assistance, Utility Assistance, Clothing, Case Management, For Kids",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": [
           [
             900,
@@ -1298,9 +1358,11 @@
         "Longitude": -89.37203227,
         "Description": "A nonprofit law firm providing free civil legal services to low-income individuals in Wisconsin, focusing on housing, benefits, and family law.",
         "Contact": "1 (608) 256-3304",
-        "Hours": "Mon-Fri: 9:00 AM-5:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 9:00 AM–5:00 PM; Sat–Sun: Closed",
         "Link": "https://legalaction.org/",
         "Services": "Legal Consultation, Civil Rights, Tenant Rights, Benefits Appeals, Family Law, Eviction Prevention",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": [
           [
             900,
@@ -1343,9 +1405,11 @@
         "Longitude": -89.38414075,
         "Description": "A public law library located in the Dane County Courthouse offering access to legal research materials and self-help resources for residents.",
         "Contact": "1 (608) 266-6316",
-        "Hours": "Mon-Fri: 8:30 AM-4:30 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 8:30 AM–4:30 PM; Sat–Sun: Closed",
         "Link": "https://wilawlibrary.gov/",
         "Services": "Self-Help Legal, Law Library, Legal Consultation, Walk-In",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": [
           [
             830,
@@ -1388,9 +1452,11 @@
         "Longitude": -89.38422665,
         "Description": "A Madison law firm focused on civil rights and community advocacy, providing legal representation with an emphasis on compassion and social justice.",
         "Contact": "1 (608) 204-9642",
-        "Hours": "Mon-Fri: 9:00 AM-5:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 9:00 AM–5:00 PM; Sat–Sun: Closed",
         "Link": "http://www.communityjusticeinc.org/",
         "Services": "Legal Consultation, Civil Rights, Tenant Rights, Family Law",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": [
           [
             900,
@@ -1433,9 +1499,11 @@
         "Longitude": -89.39191421,
         "Description": "A nonprofit (ABC for Health) that helps individuals and families navigate health insurance enrollment, Medicaid, and hospital financial assistance programs.",
         "Contact": "1 (608) 261-6939",
-        "Hours": "Mon-Fri: 8:30 AM-5:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 8:30 AM–5:00 PM; Sat–Sun: Closed",
         "Link": "http://www.safetyweb.org/",
         "Services": "Medicaid Enrollment, Health Insurance Navigation, Hospital Bill Assistance, Benefits Appeals",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": [
           [
             830,
@@ -1478,9 +1546,11 @@
         "Longitude": -89.34824833,
         "Description": "A nonprofit offering free counseling, resources, and emergency rental assistance to both tenants and landlords navigating housing disputes and instability.",
         "Contact": "1 (608) 257-0006",
-        "Hours": "Mon-Wed: 9:00 AM-6:00 PM; Thu: 9:00 AM-4:00 PM; Fri-Sun: Closed",
+        "Hours": "Mon–Wed: 9:00 AM–6:00 PM; Thu: 9:00 AM–4:00 PM; Fri–Sun: Closed",
         "Link": "http://www.tenantresourcecenter.org/",
         "Services": "Rental Assistance, Tenant Rights, Tenant Counseling, Landlord Mediation, Eviction Prevention",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": [
           [
             900,
@@ -1523,6 +1593,8 @@
         "Hours": "Check website for current office hours",
         "Link": "https://vdlf.org/",
         "Services": "Immigration Advocacy, Civic Engagement, Wage Theft Support, Civil Rights, Spanish-Language",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": null
       },
       "geometry": {
@@ -1542,9 +1614,11 @@
         "Longitude": -89.39504556,
         "Description": "A walk-in clinic offering free legal consultations and advocacy for low-wage workers facing wage theft, unsafe conditions, or other workplace violations.",
         "Contact": "1 (608) 255-0376",
-        "Hours": "Mon-Fri: 9:00 AM-5:00 PM; Sat-Sun: Closed",
+        "Hours": "Mon–Fri: 9:00 AM–5:00 PM; Sat–Sun: Closed",
         "Link": "http://workerjustice.org/",
         "Services": "Wage Theft Support, Workplace Safety, Legal Consultation, Civil Rights, Walk-In, Spanish-Language",
+        "Category": "Legal",
+        "iconFile": "courthouse.svg",
         "HoursParsed": [
           [
             900,

@@ -5,7 +5,8 @@
     var map;
     var locationsLayer; // Enables filtering via search and other filter controls
     var accessMode = sessionStorage.getItem('commonGoodAccessMode')
-    var activeFilters = { searchTerm: '', timeMode: 'anytime'}; // updating so filters work in concert -jc
+    var activeFilters = { searchTerm: '', timeMode: 'anytime', categories: new Set() };
+    // var activeFilters = { searchTerm: '', timeMode: 'anytime'}; // updating so filters work in concert -jc
     var MAP_ICON_ALLOWLIST = [
         'bicycle.svg',
         'courthouse.svg',
@@ -17,22 +18,69 @@
         'social_facility.svg',
         'trade.svg'
     ];
+    
+    var iconSvgCache = {};
 
-    function buildMapIcon(iconFileName) {
-        if (!iconFileName) { return null; }
+    function fetchIconSvg(iconFile, callback) {
+        if (!iconFile) { callback(''); return;}
+        if (iconSvgCache[iconFile]) { callback(iconSvgCache[iconFile]); return; }
 
-        var normalized = String(iconFileName).split('/').pop();
-        if (MAP_ICON_ALLOWLIST.indexOf(normalized) === -1) {
-            return null;
-        }
+        fetch('img/map-icons/' + iconFile)
+            .then(function(r) { return r.text(); })
+            .then(function(svgText) {
+                iconSvgCache[iconFile] = svgText;
+                callback(svgText);
+            })
+            .catch(function() { callback(''); });
+    }
 
-        return L.icon({
-            iconUrl: 'img/map-icons/' + normalized,
-            iconSize: [34, 34],
-            iconAnchor: [17, 34],
-            popupAnchor: [0, -34]
+
+
+    function buildMapIcon(iconFile, category, callback) {
+        var color = (CATEGORY_META[category] && CATEGORY_META[category].color) || '#555555';
+
+        fetchIconSvg(iconFile, function(svgText) {
+            // Strip the outer <svg> wrapper so we can nest it inside our pin SVG
+            var inner = svgText
+                .replace(/<\?xml[^>]*>/i, '')
+                .replace(/<!DOCTYPE[^>]*>/i, '')
+                .replace(/<svg[^>]*>/, '')
+                .replace(/<\/svg>/, '')
+                .trim();
+
+            // Wrap in a group that scales and positions it into the pin's circle
+            var iconGroup = inner
+                ? '<g transform="translate(4,4) scale(1.3)" style="filter:brightness(0) invert(1)">' + inner + '</g>'
+                : '<circle cx="14" cy="14" r="4" fill="rgba(255,255,255,0.9)"/>';
+
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">'
+                + '<ellipse cx="14" cy="35.5" rx="5" ry="2" fill="rgba(0,0,0,0.22)"/>'
+                + '<path d="M14 2 C7.37 2 2 7.37 2 14 C2 22.5 14 36 14 36 C14 36 26 22.5 26 14 C26 7.37 20.63 2 14 2 Z" fill="' + color + '" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>'
+                + '<circle cx="14" cy="14" r="9.5" fill="rgba(255,255,255,0.18)"/>'
+                + iconGroup
+                + '</svg>';
+
+            var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+            callback(L.icon({
+                iconUrl:     url,
+                iconSize:    [28, 38],
+                iconAnchor:  [14, 38],
+                popupAnchor: [0, -40]
+            }));
         });
     }
+
+    var CATEGORY_META = {
+            'Bicycle Access': { color: '#3a86cc' },
+            'Food':           { color: '#e05c2a' },
+            'Library':        { color: '#7c4dcc' },
+            'Garden':         { color: '#3aaa5c' },
+            'Housing':        { color: '#cc7a3a' },
+            'Childcare':      { color: '#cc3a6e' },
+            'Crafting':       { color: '#888888' },
+            'Tool Rental':    { color: '#b07d2a' },
+            'Legal':          { color: '#4a5a8c' },
+        };
 
     // ── Guest session: clear data on page reload ────────────────────────────────
     function handleGuestReload() {
@@ -79,8 +127,9 @@
             .then(function(json){
                 createSymbols(json);
                 addUserLocations();
+                createNavMenu(json); // moving into here to receive the locations.geojson
             })
-        createNavMenu();
+        // createNavMenu();
         createInfoButton();
         createSearchFilter();
         createTimeFilter();
@@ -151,25 +200,44 @@
     }
 
     // ── Adding initial locations to the map ─────────────────────────────────────
+//  
     function createSymbols(data) {
-        locationsLayer = L.geoJson(data, { // Assign pseudoglobal variable data to make searching possible
-            pointToLayer: function(feature, latlng){
-                if (feature.properties && feature.properties.iconFile) {
-                    var customIcon = buildMapIcon(feature.properties.iconFile);
-                    if (customIcon) {
-                        return L.marker(latlng, { icon: customIcon });
-                    }
-                }
-                return L.marker(latlng);
+        locationsLayer = L.geoJson(data, {
+            pointToLayer: function(feature, latlng) {
+                var props    = feature.properties || {};
+                var marker   = L.marker(latlng); // placeholder until icon loads
+                buildMapIcon(props.iconFile || '', props.Category || '', function(icon) {
+                    marker.setIcon(icon);
+                });
+                return marker;
             },
             onEachFeature: function(feature, layer) {
-                // Build popup content, established here because popups themselves do not change.
                 layer.properties = feature.properties;
-                var popupContent = buildPopupContent(layer.properties);
-                layer.bindPopup(popupContent);
+                layer.bindPopup(buildPopupContent(layer.properties));
             }
         }).addTo(map);
-}
+    }
+
+// COMMENTING OUT TO TEST SYMBOL CREATION: -jc
+// function createSymbols(data) {
+//         locationsLayer = L.geoJson(data, { // Assign pseudoglobal variable data to make searching possible
+//             pointToLayer: function(feature, latlng){
+//                 if (feature.properties && feature.properties.iconFile) {
+//                     var customIcon = buildMapIcon(feature.properties.iconFile);
+//                     if (customIcon) {
+//                         return L.marker(latlng, { icon: customIcon });
+//                     }
+//                 }
+//                 return L.marker(latlng);
+//             },
+//             onEachFeature: function(feature, layer) {
+//                 // Build popup content, established here because popups themselves do not change.
+//                 layer.properties = feature.properties;
+//                 var popupContent = buildPopupContent(layer.properties);
+//                 layer.bindPopup(popupContent);
+//             }
+//         }).addTo(map);
+// }
 
     // ── User-created locations from sessionStorage ──────────────────────────────
     var userStarIcon = L.divIcon({
@@ -294,6 +362,7 @@
         var mode = activeFilters.timeMode;
 
         locationsLayer.eachLayer(function(layer) { // Iterate through each point on the map...
+            
             if (!layer.properties) return; // In case a point has no properties, skip it.
 
             var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
@@ -307,7 +376,10 @@
                 matchesTime = isOpenAtTime(layer.properties.HoursParsed, activeFilters.customTime)
             }
 
-            if (matchesSearch && matchesTime) { //If it matches search and matches time...
+            var activeCats = activeFilters.categories;
+            var matchesCategory = activeCats.size === 0 || activeCats.has(layer.properties.Category || '');
+            
+            if (matchesSearch && matchesTime && matchesCategory) { //If it matches search and matches time...
                 layer.addTo(map); // Adds the marker to the map
             } else { 
                 layer.removeFrom(map); // Remove the marker from the map until it meets search criteria
@@ -591,7 +663,22 @@
     // ── Navigation menu (top-right hamburger) ───────────────────────────────────
     // Before login: shows only "Login".
     // After login or guest: shows "Locations", "Profile", and "Logout".
-    function createNavMenu() {
+    function createNavMenu(geojson) {
+        //creating list to house unique categories for nav menu - jc
+        var seenCats = {};
+        var catsInData = [];
+        (geojson ? geojson.features : []).forEach(function(feature) {
+            var cat = (feature.properties && feature.properties.Category) || '';
+            if (cat && !seenCats[cat]) {
+                seenCats[cat] = true;
+                catsInData.push({
+                    category: cat,
+                    iconFile: feature.properties.iconFile || '',
+                    color: (CATEGORY_META[cat] && CATEGORY_META[cat].color) || '#555555'
+                });
+            }
+        });
+
         var navMenu = L.Control.extend({
             options: {position: 'topright'},
 
@@ -624,6 +711,57 @@
                     // No active session: show only Login
                     content.innerHTML = '<p><a href="login.html">Login</a></p>';
                 }
+
+                // setting up filter legend - jc
+                var filterHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
+                filterHeading.innerHTML = '<b>Filter by Category</b>';
+
+                var legend = L.DomUtil.create('div', 'navmenu-legend', content);
+
+                catsInData.forEach(function(entry) {
+                    var groupRow = L.DomUtil.create('div', 'legend-group-row', legend);
+
+                    //checkboxes - jc
+                    var checkbox = L.DomUtil.create('input', 'legend-group-checkbox', groupRow);
+                    checkbox.type = 'checkbox';
+                    checkbox.id = 'filter-cat-' + entry.category.replace(/\s+/g, '-');
+
+                    //colored swatch with icon image:
+                    var swatch = L.DomUtil.create('span', 'legend-swatch', groupRow);
+                    swatch.style.background = entry.color;
+                    if (entry.iconFile) {
+                        var swatchImg = document.createElement('img');
+                        swatchImg.src = 'img/map-icons/' + entry.iconFile;
+                        swatchImg.style.cssText = 'width:9px;height:9px;filter:brightness(0) invert(1);display:block;margin:2px auto 0;';
+                        swatch.appendChild(swatchImg);
+                    }
+
+                    // labeling
+                    var label = L.DomUtil.create('label', 'legend-group-label', groupRow);
+                    label.htmlFor     = checkbox.id;
+                    label.textContent = entry.category;
+
+                    // Checkbox change → update filter and re-apply
+                    L.DomEvent.on(checkbox, 'change', function() {
+                        if (checkbox.checked) {
+                            activeFilters.categories.add(entry.category);
+                        } else {
+                            activeFilters.categories.delete(entry.category);
+                        }
+                        applyFilters();
+                    });
+                });
+
+                // Clear all category filters button
+                var clearBtn = L.DomUtil.create('button', 'navmenu-clear-filters', content);
+                clearBtn.textContent = 'Clear Category Filters';
+                L.DomEvent.on(clearBtn, 'click', function() {
+                    activeFilters.categories.clear();
+                    legend.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+                        cb.checked = false;
+                    });
+                    applyFilters();
+                });                   
 
                 // Toggle the content on/off when the menu button is clicked
                 L.DomEvent.on(button, 'click', function() {
