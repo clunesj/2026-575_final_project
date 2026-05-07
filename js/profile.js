@@ -1,5 +1,6 @@
 // profile.js, by Joseph Kowalczyk, James Clunes, and Brooke Fandrich
 (function () {
+    // These are the sessionStorage key names used to read and write profile data across pages.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         email: 'commonGoodUserEmail',
@@ -12,6 +13,7 @@
 
     // --- Access guard (mirrors main.js pattern) ---
 
+    // This clears all guest session data and sends the user back to the home page if they reload while in guest mode.
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -25,14 +27,14 @@
         return false;
     }
 
+    // This redirects to the home page if no access mode is found in sessionStorage.
     function enforceAccess() {
         if (!accessMode) {
             window.location.href = 'index.html';
         }
     }
 
-    // --- Session badge ---
-
+    // This updates the header badge to show either guest mode or the signed-in email address.
     function updateSessionBadge() {
         var badge = document.getElementById('session-badge');
         if (!badge) { return; }
@@ -45,13 +47,13 @@
         }
     }
 
-    // --- Avatar ---
-
+    // This sets the profile photo element to display the given image source string.
     function setAvatarSrc(src) {
         var img = document.getElementById('profile-avatar');
         if (img && src) { img.src = src; }
     }
 
+    // This wires the photo upload button so clicking it opens a file picker and saves the chosen image to sessionStorage.
     function bindPhotoUpload() {
         var changeBtn = document.getElementById('change-photo-btn');
         var fileInput = document.getElementById('photo-input');
@@ -76,8 +78,7 @@
         });
     }
 
-    // --- Form load / save ---
-
+    // This fills the name and email fields from sessionStorage when the profile page loads, and restores any saved photo.
     function loadProfile() {
         var nameInput = document.getElementById('profile-name');
         var emailInput = document.getElementById('profile-email');
@@ -96,6 +97,7 @@
         if (savedPhoto) { setAvatarSrc(savedPhoto); }
     }
 
+    // This shows a brief status message below the profile form and clears it after three seconds.
     function showSaveStatus(message, isError) {
         var status = document.getElementById('profile-save-status');
         if (!status) { return; }
@@ -109,6 +111,7 @@
         }, 3000);
     }
 
+    // This listens for the profile form submit and writes the name and email into sessionStorage.
     function bindForm() {
         var form = document.getElementById('profile-form');
         if (!form) { return; }
@@ -126,6 +129,7 @@
         });
     }
 
+    // This clears the access mode and email from sessionStorage when the user clicks the logout link.
     function bindLogout() {
         var logoutLink = document.getElementById('logout-link');
         if (!logoutLink) { return; }
@@ -136,8 +140,7 @@
         });
     }
 
-    // --- Init ---
-
+    // This runs all setup steps in order once the DOM is ready.
     function init() {
         if (resetGuestSessionOnReload()) { return; }
 

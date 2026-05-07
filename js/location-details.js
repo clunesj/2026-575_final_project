@@ -1,9 +1,11 @@
 // location-details.js
 (function () {
+    // This is a shortcut for getElementById to keep the code easier to read.
     function byId(id) {
         return document.getElementById(id);
     }
 
+    // This escapes special HTML characters in a string so it is safe to insert into the page.
     function escapeHtml(value) {
         var text = value === null || value === undefined ? '' : String(value);
         return text
@@ -14,6 +16,7 @@
             .replace(/'/g, '&#39;');
     }
 
+    // This safely reads and parses a JSON value from sessionStorage, returning the fallback if the key is missing or invalid.
     function parseJsonFromSession(key, fallback) {
         try {
             var raw = sessionStorage.getItem(key);
@@ -24,6 +27,7 @@
         }
     }
 
+    // This converts a raw services value, which can be an array or a comma-separated string, into a plain array of names.
     function toServiceList(rawServices) {
         if (Array.isArray(rawServices)) {
             return rawServices
@@ -45,6 +49,7 @@
         return [];
     }
 
+    // This builds and inserts the services list into the page, or shows a placeholder if no services are listed.
     function renderServices(items) {
         var list = byId('details-services-list');
         if (!list) { return; }
@@ -65,6 +70,7 @@
         });
     }
 
+    // This builds the website and social links section and shows a message if no links are available.
     function renderLinks(siteUrl, socialLinks) {
         var wrap = byId('details-links-wrap');
         if (!wrap) { return; }
@@ -90,6 +96,7 @@
         wrap.innerHTML = htmlParts.join('');
     }
 
+    // This fills all the detail page fields with data from a location object, including name, address, contact, and photos.
     function applyDetails(details) {
         var locationName = byId('details-location-name');
         var locationAddress = byId('details-location-address');
@@ -138,6 +145,7 @@
         renderLinks(details.siteUrl, details.socialLinks);
     }
 
+    // This converts a raw GeoJSON feature from the dataset into the shape that applyDetails expects.
     function mapDatasetFeature(feature) {
         var properties = feature && feature.properties ? feature.properties : {};
         return {
@@ -155,6 +163,7 @@
         };
     }
 
+    // This searches the sessionStorage list of user-created locations for one matching the given id or name.
     function getUserLocationById(locationId, locationName) {
         var createdLocations = parseJsonFromSession('commonGoodCreatedLocations', []);
         if (!Array.isArray(createdLocations)) { return null; }
@@ -171,6 +180,7 @@
         }) || null;
     }
 
+    // This fetches the GeoJSON dataset and returns the feature whose Key property matches the given id.
     function getDatasetLocationById(id) {
         return fetch('data/locations.geojson')
             .then(function (response) { return response.json(); })
@@ -192,6 +202,7 @@
             });
     }
 
+    // This converts a raw sessionStorage location record into the shape that applyDetails expects.
     function mapUserLocation(location) {
         if (!location || typeof location !== 'object') {
             return null;
@@ -212,6 +223,7 @@
         };
     }
 
+    // This returns a hardcoded placeholder location used when no real data can be found.
     function fallbackMockup() {
         return {
             name: 'Madison Makers Studio',
@@ -233,6 +245,7 @@
         };
     }
 
+    // This reads the URL query parameters to decide which location to display, then loads and renders its data.
     function init() {
         var params = new URLSearchParams(window.location.search);
         var source = params.get('source');

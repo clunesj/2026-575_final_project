@@ -11,6 +11,23 @@
     <body>
         <div id="map"></div>
 
+        <!-- Welcome modal -->
+        <div id="welcome-backdrop" class="welcome-backdrop" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+            <div class="welcome-modal">
+                <h1 id="welcome-title" class="welcome-modal-title">Welcome to CommonGood</h1>
+                <p class="welcome-modal-body">
+                    CommonGood is a community resource map for the Madison, WI area.
+                    Discover local services, food resources, tool libraries, and more —
+                    all contributed by neighbors helping neighbors.
+                </p>
+                <p class="welcome-modal-body">
+                    Use the search bar to find resources by name or service type, or simply
+                    explore the map. If you're a host, log in to create and manage your own location listing.
+                </p>
+                <button id="welcome-close-btn" class="welcome-close-btn" type="button">Explore the Map</button>
+            </div>
+        </div>
+
         <script src="lib/dist/leaflet.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
     </body>

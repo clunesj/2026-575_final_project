@@ -7,8 +7,10 @@
         <link rel="stylesheet" href="../css/style.css?v=8">
     </head>
 
+    <!-- reservation-calendar.html: weekly calendar grid with bookings, events, and breaks plus modals to set hours and add bookings. -->
     <body class="hosting-dashboard-page">
         <div class="hosting-dashboard-layout">
+            <!-- Left sidebar: hosting section navigation links. -->
             <aside class="hosting-dashboard-sidebar" aria-label="Hosting navigation">
                 <h2 class="hosting-dashboard-brand">HOSTING:</h2>
                 <nav class="hosting-dashboard-nav">
@@ -20,6 +22,7 @@
             </aside>
 
             <main class="hosting-dashboard-main">
+                <!-- Page header with title, hours/booking buttons, and a back-to-map link. -->
                 <header class="reservation-header">
                     <h1 id="reservation-calendar-title">Reservation Calendar</h1>
                     <div class="reservation-header-actions">
@@ -29,6 +32,7 @@
                     </div>
                 </header>
 
+                <!-- Weekly calendar grid: hours summary, week navigation arrows, and the scrollable grid rendered by JS. -->
                 <section class="reservation-shell" aria-label="Weekly reservation calendar">
                     <p class="reservation-hours-summary" id="reservation-hours-summary">Current Location Hours:</p>
 
@@ -43,6 +47,7 @@
                     </div>
                 </section>
 
+                <!-- Management list: all bookings, events, and breaks for the current week with edit and delete controls. -->
                 <section class="hosting-panel reservation-manage-panel" aria-label="Manage scheduled items">
                     <h2>Manage Schedule</h2>
                     <div id="reservation-items-list" class="reservation-items-list">
@@ -52,6 +57,7 @@
             </main>
         </div>
 
+        <!-- Hours modal: day selector, open/close time inputs, closed-all-day checkbox, and apply-to-week button. -->
         <div class="hosting-modal-backdrop" id="hours-modal-backdrop" hidden>
             <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="hours-modal-title">
                 <button class="hosting-modal-close" id="close-hours-modal" type="button" aria-label="Close modal">x</button>
@@ -86,6 +92,7 @@
             </div>
         </div>
 
+        <!-- New booking modal: name, date, and time range inputs. -->
         <div class="hosting-modal-backdrop" id="booking-modal-backdrop" hidden>
             <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
                 <button class="hosting-modal-close" id="close-booking-modal" type="button" aria-label="Close modal">x</button>
@@ -107,6 +114,7 @@
             </div>
         </div>
 
+        <!-- Edit modal: pre-filled fields for editing or deleting any existing booking, event, or break. -->
         <div class="hosting-modal-backdrop" id="edit-schedule-item-backdrop" hidden>
             <div class="hosting-modal" role="dialog" aria-modal="true" aria-labelledby="edit-schedule-item-title">
                 <button class="hosting-modal-close" id="close-edit-schedule-item" type="button" aria-label="Close modal">x</button>

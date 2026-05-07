@@ -1,5 +1,6 @@
 // host-dashboard.js
 (function () {
+    // These are the sessionStorage key names used to read and write dashboard-related data.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         profileName: 'commonGoodProfileName',
@@ -14,6 +15,7 @@
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
 
+    // This safely reads and parses a JSON value from sessionStorage, returning the fallback if the key is missing or invalid.
     function parseJsonFromSession(key, fallback) {
         try {
             var value = sessionStorage.getItem(key);
@@ -24,6 +26,7 @@
         }
     }
 
+    // This converts a time string like "09:00" into an integer hour number.
     function parseTimeToHour(timeValue) {
         var parts = (timeValue || '').split(':');
         var hour = parseInt(parts[0], 10);
@@ -31,10 +34,12 @@
         return hour;
     }
 
+    // This returns true if two hour ranges overlap each other.
     function overlaps(startA, endA, startB, endB) {
         return startA < endB && startB < endA;
     }
 
+    // This returns the Sunday that starts the week containing the given date.
     function getWeekStartDate(date) {
         var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         d.setDate(d.getDate() - d.getDay());
@@ -42,10 +47,12 @@
         return d;
     }
 
+    // This formats a Date object as a YYYY-MM-DD string.
     function toIsoDate(date) {
         return date.toISOString().slice(0, 10);
     }
 
+    // This parses a date string and returns the ISO date of the Sunday that starts its week.
     function getWeekStartIsoFromDateString(dateString) {
         var parsed = new Date(dateString + 'T00:00:00');
         if (isNaN(parsed.getTime())) {
@@ -54,6 +61,7 @@
         return toIsoDate(getWeekStartDate(parsed));
     }
 
+    // This checks whether a proposed break time on the given days and week would overlap any existing booking or event.
     function breakOverlapsExistingItems(selectedDays, startHour, endHour, weekStartIso) {
         var bookings = parseJsonFromSession(KEYS.bookings, []);
         var events = parseJsonFromSession(KEYS.events, []);
@@ -73,29 +81,7 @@
         });
     }
 
-    function ensureGuestSeedLocation() {
-        if (accessMode !== 'guest') { return; }
-
-        var storedLocations = [];
-        try {
-            storedLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
-        } catch (error) {
-            storedLocations = [];
-        }
-
-        if (Array.isArray(storedLocations) && storedLocations.length > 0) { return; }
-
-        var seedLocation = {
-            name: 'Test Location',
-            address: '777 University Ave, Madison, WI'
-        };
-
-        sessionStorage.setItem(KEYS.createdLocation, 'true');
-        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
-        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
-        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
-    }
-
+    // This clears the guest session and redirects to the home page if the guest user reloads the page.
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -109,6 +95,7 @@
         return false;
     }
 
+    // This redirects to the home page if not logged in, or to the location creator if no location has been saved yet.
     function enforceAccess() {
         if (!accessMode) {
             window.location.href = '/index.html';
@@ -123,6 +110,7 @@
         return true;
     }
 
+    // This sets the dashboard heading using the saved location name, or falls back to the host profile name.
     function setDashboardTitle() {
         var titleEl = document.getElementById('hosting-dashboard-title');
         if (!titleEl) { return; }
@@ -143,6 +131,7 @@
         titleEl.textContent = 'Your Location Dashboard';
     }
 
+    // This wires the break scheduling modal including day toggles, time inputs, conflict checking, and saving to sessionStorage.
     function bindEventModal() {
         var openBtn = document.getElementById('open-break-modal');
         var closeBtn = document.getElementById('close-event-modal');
@@ -156,7 +145,8 @@
 
         if (!openBtn || !closeBtn || !confirmBtn || !backdrop || !dayButtons.length || !startInput || !endInput || !weekDateInput || !reasonInput) { return; }
 
-        function resetSelections() {
+    // This resets the modal inputs and hides the backdrop.
+            function resetSelections() {
             dayButtons.forEach(function (button) {
                 button.classList.remove('is-selected');
             });
@@ -166,7 +156,8 @@
             reasonInput.value = '';
         }
 
-        function getSelectedDays() {
+    // This collects the day numbers of all currently selected day buttons.
+            function getSelectedDays() {
             var selected = [];
             dayButtons.forEach(function (button) {
                 if (button.classList.contains('is-selected')) {
@@ -250,8 +241,8 @@
         });
     }
 
+    // This runs the access guard and sets up the dashboard when the page finishes loading.
     function init() {
-        ensureGuestSeedLocation();
         if (resetGuestSessionOnReload()) { return; }
         if (!enforceAccess()) { return; }
         setDashboardTitle();

@@ -1,5 +1,6 @@
 // your-events.js
 (function () {
+    // These are the sessionStorage key names used to read and write event and location data on this page.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         locationName: 'commonGoodLocationName',
@@ -12,29 +13,31 @@
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
 
-    function ensureGuestSeedLocation() {
-        if (accessMode !== 'guest') { return; }
-
-        var storedLocations = [];
+    // This removes legacy placeholder data if old sessions still contain the hardcoded Test Location.
+    function purgeSeedLocation() {
+        var raw;
         try {
-            storedLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
-        } catch (error) {
-            storedLocations = [];
+            raw = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
+        } catch (e) {
+            raw = [];
         }
 
-        if (Array.isArray(storedLocations) && storedLocations.length > 0) { return; }
+        var filtered = raw.filter(function (entry) {
+            var name = typeof entry === 'string' ? entry : (entry && entry.name ? entry.name : '');
+            return name !== 'Test Location';
+        });
 
-        var seedLocation = {
-            name: 'Test Location',
-            address: '777 University Ave, Madison, WI'
-        };
-
-        sessionStorage.setItem(KEYS.createdLocation, 'true');
-        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
-        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
-        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
+        if (filtered.length !== raw.length) {
+            sessionStorage.setItem(KEYS.createdLocations, JSON.stringify(filtered));
+            if (filtered.length === 0) {
+                sessionStorage.removeItem(KEYS.createdLocation);
+                sessionStorage.removeItem(KEYS.locationName);
+                sessionStorage.removeItem(KEYS.locationAddress);
+            }
+        }
     }
 
+    // This safely reads and parses a JSON value from sessionStorage, returning the fallback if the key is missing or invalid.
     function parseJsonFromSession(key, fallback) {
         try {
             var value = sessionStorage.getItem(key);
@@ -45,6 +48,7 @@
         }
     }
 
+    // These are date math helpers used when setting default dates for new events.
     function getWeekStart(date) {
         var d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         d.setDate(d.getDate() - d.getDay());
@@ -79,6 +83,7 @@
         });
     }
 
+    // This initializes an empty events list in sessionStorage if one does not already exist.
     function ensureEventSeedData() {
         var events = parseJsonFromSession(KEYS.events, null);
         if (events) { return; }
@@ -86,6 +91,7 @@
         sessionStorage.setItem(KEYS.events, JSON.stringify([]));
     }
 
+    // This reads all events from sessionStorage, sorts them by date, and renders each one as a card on the page.
     function renderEvents() {
         var listEl = document.getElementById('events-list');
         var countEl = document.getElementById('events-count-label');
@@ -112,7 +118,7 @@
             var card = document.createElement('article');
             card.className = 'events-card';
 
-            var locationName = sessionStorage.getItem(KEYS.locationName) || 'Test Location';
+            var locationName = sessionStorage.getItem(KEYS.locationName) || 'Selected Location';
             var notes = event.locationNotes ? (' • ' + event.locationNotes) : '';
 
             card.innerHTML =
@@ -142,6 +148,7 @@
         return startA < endB && startB < endA;
     }
 
+    // This checks whether a proposed event time on a given date overlaps any scheduled break for the location.
     function isBlockedByBreak(dateIso, startHour, endHour) {
         var breaks = parseJsonFromSession(KEYS.breaks, []);
         var date = new Date(dateIso + 'T00:00:00');
@@ -158,6 +165,7 @@
         });
     }
 
+    // This wires the event creation modal with title, date, and time inputs, break conflict checking, and saving to sessionStorage.
     function bindCreateEventModal() {
         var openBtn = document.getElementById('open-create-event-modal');
         var closeBtn = document.getElementById('close-create-event-modal');
@@ -242,6 +250,7 @@
         });
     }
 
+    // This clears the guest session and redirects home if the guest user reloads the page.
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -255,6 +264,7 @@
         return false;
     }
 
+    // This redirects to the home page if not logged in, or to the location creator if no location has been saved yet.
     function enforceAccess() {
         if (!accessMode) {
             window.location.href = '/index.html';
@@ -269,8 +279,9 @@
         return true;
     }
 
+    // This runs all setup steps in order when the page finishes loading.
     function init() {
-        ensureGuestSeedLocation();
+        purgeSeedLocation();
         if (resetGuestSessionOnReload()) { return; }
         if (!enforceAccess()) { return; }
         ensureEventSeedData();

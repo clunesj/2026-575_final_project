@@ -1,5 +1,6 @@
 // locations.js, by Joseph Kowalczyk, James Clunes, and Brooke Fandrich
 (function () {
+    // These are the sessionStorage key names used to read profile and location data on this page.
     var KEYS = {
         mode: 'commonGoodAccessMode',
         email: 'commonGoodUserEmail',
@@ -13,29 +14,31 @@
 
     var accessMode = sessionStorage.getItem(KEYS.mode);
 
-    function ensureGuestSeedLocation() {
-        if (accessMode !== 'guest') { return; }
-
-        var storedLocations = [];
+    // This checks session storage for the old hardcoded test location and removes it if it is still there.
+    function purgeSeedLocation() {
+        var raw;
         try {
-            storedLocations = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
-        } catch (error) {
-            storedLocations = [];
+            raw = JSON.parse(sessionStorage.getItem(KEYS.createdLocations) || '[]');
+        } catch (e) {
+            raw = [];
         }
 
-        if (Array.isArray(storedLocations) && storedLocations.length > 0) { return; }
+        var filtered = raw.filter(function (entry) {
+            var name = typeof entry === 'string' ? entry : (entry && entry.name ? entry.name : '');
+            return name !== 'Test Location';
+        });
 
-        var seedLocation = {
-            name: 'Test Location',
-            address: '777 University Ave, Madison, WI'
-        };
-
-        sessionStorage.setItem(KEYS.createdLocation, 'true');
-        sessionStorage.setItem(KEYS.locationName, seedLocation.name);
-        sessionStorage.setItem(KEYS.locationAddress, seedLocation.address);
-        sessionStorage.setItem(KEYS.createdLocations, JSON.stringify([seedLocation]));
+        if (filtered.length !== raw.length) {
+            sessionStorage.setItem(KEYS.createdLocations, JSON.stringify(filtered));
+            if (filtered.length === 0) {
+                sessionStorage.removeItem(KEYS.createdLocation);
+                sessionStorage.removeItem(KEYS.locationName);
+                sessionStorage.removeItem(KEYS.locationAddress);
+            }
+        }
     }
 
+    // This clears all guest session data and sends the user back to the home page if they reload while in guest mode.
     function resetGuestSessionOnReload() {
         var navEntries = performance.getEntriesByType('navigation');
         var navType = navEntries.length ? navEntries[0].type : '';
@@ -49,12 +52,14 @@
         return false;
     }
 
+    // This redirects to the home page if no access mode is found in sessionStorage.
     function enforceAccess() {
         if (!accessMode) {
             window.location.href = '/index.html';
         }
     }
 
+    // This updates the header badge to show either guest mode or the signed-in email address.
     function updateSessionBadge() {
         var badge = document.getElementById('session-badge');
         if (!badge) { return; }
@@ -67,6 +72,7 @@
         }
     }
 
+    // This fills the sidebar name and avatar from sessionStorage when the page loads.
     function loadSidebarProfile() {
         var nameEl = document.getElementById('sidebar-name');
         var avatarEl = document.getElementById('sidebar-avatar');
@@ -82,6 +88,7 @@
         }
     }
 
+    // This reads the list of created locations from sessionStorage and builds the sidebar list with dashboard and edit links.
     function renderCreatedLocations() {
         var listEl = document.getElementById('created-locations-list');
         var emptyEl = document.getElementById('created-locations-empty');
@@ -125,6 +132,7 @@
             dashboardLink.className = 'locations-created-action';
             dashboardLink.href = '/hosting/host-dashboard.html';
             dashboardLink.textContent = 'Dashboard';
+            // Before navigating, write the selected location back into sessionStorage so the dashboard and editor can read it.
             dashboardLink.addEventListener('click', function () {
                 sessionStorage.setItem(KEYS.createdLocation, 'true');
                 sessionStorage.setItem(KEYS.locationName, locationObj.name);
@@ -135,6 +143,7 @@
             editLink.className = 'locations-created-action';
             editLink.href = '/hosting/add.html?mode=edit';
             editLink.textContent = 'Edit Details';
+            // Same as above but for the edit details link.
             editLink.addEventListener('click', function () {
                 sessionStorage.setItem(KEYS.createdLocation, 'true');
                 sessionStorage.setItem(KEYS.locationName, locationObj.name);
@@ -150,6 +159,7 @@
         });
     }
 
+    // This clears the access mode and email from sessionStorage when the user logs out.
     function bindLogout() {
         var logoutLink = document.getElementById('logout-link');
         if (!logoutLink) { return; }
@@ -160,8 +170,9 @@
         });
     }
 
+    // This runs cleanup and all setup steps when the page finishes loading.
     function init() {
-        ensureGuestSeedLocation();
+        purgeSeedLocation();
         if (resetGuestSessionOnReload()) { return; }
 
         enforceAccess();

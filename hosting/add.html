@@ -11,6 +11,7 @@
 
     <body class="hosting-create-page">
         <div class="hosting-create-layout">
+            <!-- Left sidebar: hosting section navigation links. -->
             <aside class="hosting-create-sidebar" aria-label="Hosting navigation">
                 <h2 class="hosting-create-brand">HOSTING:</h2>
                 <nav class="hosting-create-nav">
@@ -22,6 +23,7 @@
             </aside>
 
             <main class="hosting-create-main">
+                <!-- Page header with the section title and quick-action buttons. -->
                 <header class="hosting-create-topbar">
                     <h1>Location Page Creation</h1>
                     <div class="hosting-create-actions">
@@ -31,18 +33,22 @@
                 </header>
 
                 <section class="hosting-create-grid">
+                    <!-- Map card: address search input, Center Map and Save Address buttons, and the Leaflet preview map. -->
                     <article class="hosting-create-card hosting-create-card--map" aria-labelledby="map-box-title">
                         <h2 id="map-box-title" class="hosting-box-title">Location Map Preview</h2>
                         <div class="hosting-map-controls">
                             <input id="location-query" type="text" placeholder="Enter address or place for map centering" list="location-suggestions" autocomplete="off">
                             <datalist id="location-suggestions"></datalist>
                             <button id="update-location-map" class="hosting-upload-btn" type="button">Center Map</button>
+                            <button id="save-address-btn" class="hosting-upload-btn hosting-upload-btn--save" type="button">Save Address</button>
                         </div>
+                        <p id="save-address-status" class="hosting-address-status" hidden></p>
                         <div class="hosting-map-panel" aria-label="Location preview map">
                             <div id="location-preview-map" class="hosting-live-map" role="img" aria-label="Interactive preview map"></div>
                         </div>
                     </article>
 
+                    <!-- Services card: name and image inputs for adding services available at the location. -->
                     <article class="hosting-create-card hosting-create-card--services" aria-labelledby="services-box-title">
                         <h2 id="services-box-title" class="hosting-box-title">Services</h2>
                         <div class="hosting-service-add">
@@ -54,6 +60,7 @@
                         <ul id="services-list" class="hosting-services-list"></ul>
                     </article>
 
+                    <!-- Links and tools card: name, banner, profile photo, accordion panels for description, social links, QR code, and contact info. -->
                     <article class="hosting-create-card hosting-create-card--meta" aria-labelledby="links-box-title">
                         <h2 id="links-box-title" class="hosting-box-title">Links & Listing Tools</h2>
                         <div class="hosting-meta-row">
@@ -108,14 +115,6 @@
                                 </div>
                             </div>
 
-                            <button class="hosting-tool-toggle" type="button" data-target="tool-icons">Map Display Icons</button>
-                            <div class="hosting-tool-panel" id="tool-icons" hidden>
-                                <label>Choose a map icon for your location:</label>
-                                <div class="icon-picker-grid" id="icon-picker-grid"></div>
-                                <button class="hosting-upload-btn" id="save-icon-btn" type="button">Save Icon</button>
-                                <p class="hosting-tool-preview" id="icon-preview">No icon selected yet.</p>
-                            </div>
-
                             <button class="hosting-tool-toggle" type="button" data-target="tool-contact">Public Contact Info</button>
                             <div class="hosting-tool-panel" id="tool-contact" hidden>
                                 <input id="public-contact-email" type="email" placeholder="Public email (optional)">
@@ -138,6 +137,7 @@
                         </div>
                     </article>
 
+                    <!-- Materials card: two lists for host-provided and guest-provided materials, plus the final submit button. -->
                     <article class="hosting-create-card hosting-create-card--materials" aria-labelledby="materials-box-title">
                         <h2 id="materials-box-title" class="hosting-box-title">Materials</h2>
 
@@ -154,7 +154,7 @@
                         </div>
 
                         <form id="create-location-form" class="hosting-submit-row" novalidate>
-                            <button class="hosting-create-action-btn" type="submit">Save Location</button>
+                            <button class="hosting-final-submit-btn" type="submit">Add to CommonGood</button>
                         </form>
                     </article>
                 </section>
