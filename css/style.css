@@ -1019,6 +1019,88 @@ body {
     }
 }
 
+/* ── Welcome modal ── */
+.welcome-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.25s;
+}
+
+.welcome-backdrop--hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.welcome-modal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 2.5rem 2.25rem;
+    max-width: 520px;
+    width: calc(100% - 2rem);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    text-align: center;
+}
+
+.welcome-modal-title {
+    margin: 0 0 1rem;
+    font-size: 1.7rem;
+    color: #1d3127;
+}
+
+.welcome-modal-body {
+    margin: 0 0 0.9rem;
+    font-size: 1rem;
+    color: #3a3a3a;
+    line-height: 1.6;
+}
+
+.welcome-close-btn {
+    margin-top: 1rem;
+    padding: 0.7rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    background: #2d5c41;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.welcome-close-btn:hover {
+    background: #1d3c2b;
+}
+
+/* ── Info button (re-open welcome modal) ── */
+.info-btn {
+    width: 40px;
+    height: 40px;
+    background: rgb(217, 234, 211);
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-style: italic;
+    color: #1d3127;
+    transition: background 0.15s;
+}
+
+.info-btn:hover {
+    background: #c2dbb8;
+}
+
 /* ── Map landing page — Leaflet navmenu control ── */
 
 .timefilter-container,
@@ -1054,14 +1136,16 @@ body {
 
 /* Expanded state */
 .navmenu-container.expanded {
-    max-width: 200px;
-    max-height: 400px;
+    max-width: 220px;
+    max-height: 80vh;
 }
 
 /* Hide content until expanded */
 .navmenu-content {
     display: none;
     padding: 10px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
 }
 
 .navmenu-container.expanded .navmenu-content {
@@ -1097,6 +1181,80 @@ body {
 .navmenu-button img {
     width: 28px;
     height: 28px;
+}
+
+/* ── Filter section heading inside nav menu ──────────────── */
+.navmenu-filter-heading {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.12);
+    font-size: 13px;
+}
+
+/* ── Legend / category list ───────────────────────────────── */
+.navmenu-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 4px 0 8px 0;
+}
+
+/* Each row: checkbox + swatch + label */
+.legend-group-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 2px;
+    border-radius: 5px;
+    transition: background 0.15s;
+}
+.legend-group-row:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.legend-group-checkbox {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: #1e3a2f;
+}
+
+/* Colored circle swatch matching the marker color */
+.legend-swatch {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(255,255,255,0.7);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.18);
+}
+
+.legend-group-label {
+    flex: 1;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* "Clear Category Filters" button */
+.navmenu-clear-filters {
+    display: block;
+    width: 100%;
+    margin: 4px 0 8px 0;
+    padding: 6px 0;
+    background: none;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.navmenu-clear-filters:hover {
+    background: #f5f5f5;
+    color: #111;
 }
 
 .searchfilter-container {
@@ -1505,10 +1663,48 @@ body {
     padding: 0;
 }
 
+.hosting-upload-btn--save {
+    background: #2d5c41;
+    color: #fff;
+    border-color: #2d5c41;
+}
+
+.hosting-upload-btn--save:hover {
+    background: #1d3c2b;
+    border-color: #1d3c2b;
+}
+
+.hosting-address-status {
+    margin: 0.35rem 0 0;
+    font-size: 0.82rem;
+    color: #2d5c41;
+    font-weight: 600;
+}
+
 .hosting-submit-row {
     margin-top: 0.85rem;
     display: flex;
     justify-content: flex-end;
+}
+
+.hosting-final-submit-btn {
+    padding: 0.75rem 1.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    background: #1d3c2b;
+    color: #fff;
+    border: 3px solid #0d1f16;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+    letter-spacing: 0.02em;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.hosting-final-submit-btn:hover {
+    background: #112716;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.3);
 }
 
 .hosting-host-preview {
