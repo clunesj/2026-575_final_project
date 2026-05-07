@@ -130,7 +130,7 @@
 
             var dashboardLink = document.createElement('a');
             dashboardLink.className = 'locations-created-action';
-            dashboardLink.href = 'hosting/host-dashboard/';
+            dashboardLink.href = 'host-dashboard/';
             dashboardLink.textContent = 'Dashboard';
             // Before navigating, write the selected location back into sessionStorage so the dashboard and editor can read it.
             dashboardLink.addEventListener('click', function () {
@@ -141,7 +141,7 @@
 
             var editLink = document.createElement('a');
             editLink.className = 'locations-created-action';
-            editLink.href = 'hosting/add/?mode=edit';
+            editLink.href = 'add/?mode=edit';
             editLink.textContent = 'Edit Details';
             // Same as above but for the edit details link.
             editLink.addEventListener('click', function () {
