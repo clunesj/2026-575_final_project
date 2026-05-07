@@ -240,6 +240,11 @@ body {
     box-shadow: var(--shadow);
 }
 
+#map {
+    top: 0 !important;
+    height: 100vh !important;
+}
+
 /* Full-screen on landing page (index.html) */
 #map {
     height: 98.416vh;
@@ -394,6 +399,30 @@ body {
     cursor: pointer;
     transition: background-color 0.15s ease, transform 0.15s ease;
     width: fit-content;
+}
+
+#title-bar {
+    position: fixed;
+    top: 0;
+    left:0;
+    right:0;
+    height: 52px;
+    z-index: 1100;
+    pointer-events: none;
+}
+
+.title-bar-brand {
+    position: absolute;
+    top: 20px;
+    right: 66px;
+    color: #1e3a2f;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 4px rgba(255,255,255,0.9),
+                 0 1px 8px rgba(255,255,255,0.7);
+    pointer-events: none;
 }
 
 .change-photo-btn:hover,
@@ -1101,6 +1130,25 @@ body {
     background: #c2dbb8;
 }
 
+.custom-time-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.custom-time-row select,
+.custom-time-row input[type="time"] {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: inherit;
+    font-size: 13px;
+    background: #fff;
+    color: var(--text);
+}
+
 /* ── Map landing page — Leaflet navmenu control ── */
 
 .timefilter-container,
@@ -1158,13 +1206,18 @@ body {
 }
 
 .navmenu-content a {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 8px;
     color: var(--accent);
     text-decoration: none;
     font-weight: 600;
+    transition: background 0.15s;
 }
 
 .navmenu-content a:hover {
-    text-decoration: underline;
+    background: #c2dbb8;
+    text-decoration: none;
 }
 
 .navmenu-button {
@@ -1223,8 +1276,8 @@ body {
 /* Colored circle swatch matching the marker color */
 .legend-swatch {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
     flex-shrink: 0;
     border: 1.5px solid rgba(255,255,255,0.7);
@@ -1277,6 +1330,7 @@ body {
     background: white;
     border: 1px solid #ccc;
     max-height: 150px;
+    overflow-y: auto;
     width: 100%;
 }
 

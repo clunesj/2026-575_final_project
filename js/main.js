@@ -5,7 +5,7 @@
     var map;
     var locationsLayer; // Enables filtering via search and other filter controls
     var accessMode = sessionStorage.getItem('commonGoodAccessMode')
-    var activeFilters = { searchTerm: '', timeMode: 'anytime', categories: new Set() };
+    var activeFilters = { searchTerm: '', timeMode: 'anytime', categories: new Set(), customDay: null };
     // var activeFilters = { searchTerm: '', timeMode: 'anytime'}; // updating so filters work in concert -jc
     var MAP_ICON_ALLOWLIST = [
         'bicycle.svg',
@@ -50,7 +50,7 @@
 
             // Wrap in a group that scales and positions it into the pin's circle
             var iconGroup = inner
-                ? '<g transform="translate(4,4) scale(1.3)" style="filter:brightness(0) invert(1)">' + inner + '</g>'
+                ? '<g transform="translate(5,5) scale(1.2)" style="filter:brightness(0) invert(1)">' + inner + '</g>'
                 : '<circle cx="14" cy="14" r="4" fill="rgba(255,255,255,0.9)"/>';
 
             var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">'
@@ -128,11 +128,13 @@
                 createSymbols(json);
                 addUserLocations();
                 createNavMenu(json); // moving into here to receive the locations.geojson
-            })
+                createTimeFilter(json);
+            });
+
         // createNavMenu();
         createInfoButton();
         createSearchFilter();
-        createTimeFilter();
+        // createTimeFilter(json);
         // createRepeatFilter(); -- Nonfunctional, see createRepeatFilter() definition.
         createZoom();
     };
@@ -308,6 +310,7 @@
                 // Search suggestions accelerator
                 var suggestionsDropdown = L.DomUtil.create('div', 'searchfilter-suggestions', container);
                 suggestionsDropdown.style.display = 'none'; // Suggestions dropdown does not display on page load.
+                L.DomEvent.disableScrollPropagation(suggestionsDropdown); // disables map scroll zoom
 
                 // Event listener for search filtering
                 L.DomEvent.on(input, 'input', function () {
@@ -337,24 +340,6 @@
         })
         map.addControl(new searchFilter());
     };
-
-    // commenting out to try a filter that works with both 11:20 jc
-    // function searchFilterLocations(searchTerm) {
-    //     var term = searchTerm.toLowerCase().trim(); // Reads the search input, saves it as a lowercase string with no whitespace
-
-    //     locationsLayer.eachLayer(function(layer) { // Iterate through each point on the map...
-    //         if (!layer.properties) return; // In case a point has no properties, skip it.
-
-    //         var name = layer.properties.Name?.toLowerCase() || ''; // If a marker has a Name value, assign it to name in lowercase. Otherwise assign a blank string.
-    //         var services = layer.properties.Services?.toLowerCase() || ''; // Likewise, but for the Services list.
-            
-    //         if (!term || name.includes(term) || services.includes(term)) { // If the search bar is empty, or the marker's Name or Services includes the search input...
-    //             layer.addTo(map); // Adds the marker to the map
-    //         } else { 
-    //             layer.removeFrom(map); // Remove the marker from the map until it meets search criteria
-    //         }
-    //     });
-    // };\
 
     // This applies the current search term and time mode filters together, showing or hiding each marker accordingly.
     function applyFilters(){
@@ -410,35 +395,23 @@
         var timeParts = timeString.split(':');
         var time = parseInt(timeParts[0]) * 100 + parseInt(timeParts[1]);
         
-        // Getting current day to retrieve current day of the week
-        var now = new Date();
-        var day = (now.getDate() + 6) % 7;
+        // Use custom day if set, otherwise fall back to today: jc
+        var day = (activeFilters.customDay !== null)
+            ? activeFilters.customDay
+            : (new Date().getDay() + 6) % 7;
+        
+        
+        var todayHours = hoursParsed[day];
+
         var todayHours = hoursParsed[day];
         
         if (todayHours === null) return false; // Always return false if location is closed
-        
         var open = todayHours[0], close = todayHours[1];
         if (close < open) { // overnight span
             return time >= open || time < close;
         }
         return time >= open && time < close;
     }
-
-    // Commenting out to try a filter that works with both 11:20 jc
-    // function timeFilterLocations(mode) { // this is the function to filter based on if the hours match now
-    //     locationsLayer.eachLayer(function(layer) {
-    //         if (!layer.properties) return;
-    //         if(mode === 'rightnow') {
-    //             if (isOpenNow(layer.properties.HoursParsed)) {
-    //                 layer.addTo(map);
-    //             } else {
-    //                 layer.removeFrom(map);
-    //             }
-    //         } else {
-    //             layer.addTo(map);
-    //             }
-    //         });
-    // }
 
     // This updates the search autocomplete dropdown with matching location names and service types as the user types.
     function updateSuggestions(searchTerm, dropdown, input) {
@@ -463,7 +436,7 @@
                 var trimmed = serviceType.trim(); // remove whitespace around the tags
                 var lower = trimmed.toLowerCase();
 
-                if (lower.includes(term) && !seen[lower] && suggestions.length <5) { // If the lowercase service list includes the search term, has not been seen before, and the total number of suggestions does not exceed 5...
+                if (lower.includes(term) && !seen[lower]) { // If the lowercase service list includes the search term, has not been seen before, and the total number of suggestions does not exceed 5...
                     seen[lower] = true;
                     suggestions.push({text: trimmed, isName: false}); // Push a json object, text is what displays as the suggestion, isName will control if the suggestion is italicized or not.
                 }
@@ -473,7 +446,7 @@
             var nameRaw = layer.properties.Name || ''; // Likewise, but for location names instead of services
             var nameLower = nameRaw.toLowerCase(); // Saves a lowercase version of the location name, matches how search filter processes inputs
 
-            if (nameLower.includes(term) && !seen[nameLower] && suggestions.length < 5) { // If the lowercase location name includes the search term, has not been seen before, and the total number of suggestions does not exceed 5...
+            if (nameLower.includes(term) && !seen[nameLower]) { // If the lowercase location name includes the search term, has not been seen before, and the total number of suggestions does not exceed 5...
                 seen[nameLower] = true // Adds the name to the seen list, preventing it from showing again
                 suggestions.push({text: nameRaw, isName: true}) // Similar to services suggestion, pushes as json object.
             }
@@ -506,7 +479,24 @@
     };
 
     // Create time filter control
-    function createTimeFilter() {
+    function createTimeFilter(geojson) {
+
+        // set up categories for filter & legend
+        var seenCats = {};
+        var catsInData = [];
+        (geojson ? geojson.features : []).forEach(function(feature) {
+            var cat = (feature.properties && feature.properties.Category) || '';
+            if (cat && !seenCats[cat]) {
+                seenCats[cat] = true;
+                catsInData.push({
+                    category: cat,
+                    iconFile: feature.properties.iconFile || '',
+                    color: (CATEGORY_META[cat] && CATEGORY_META[cat].color) || '#555555'
+                });
+            }
+        });
+
+        
         // Initialize filter menu
         var timeFilter = L.Control.extend({
             options: {position: 'topleft'},
@@ -514,11 +504,67 @@
             onAdd: function () {
                 // Create control container div
                 var container = L.DomUtil.create('div', 'timefilter-container');
+                var content = L.DomUtil.create('div','timefilter-content', container);
+                
 
-                // Container content, custom time input is hidden until the option is selected.
-                var content = L.DomUtil.create('div', 'timefilter-content', container);
-                content.innerHTML = `
-                    <b>Filter to locations available...</b>
+                // setting up filter legend - jc
+                var filterHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
+                filterHeading.innerHTML = '<b>Filter by Category</b>';
+
+                var legend = L.DomUtil.create('div', 'navmenu-legend', content);
+
+                catsInData.forEach(function(entry) {
+                    var groupRow = L.DomUtil.create('div', 'legend-group-row', legend);
+
+                    //checkboxes - jc
+                    var checkbox = L.DomUtil.create('input', 'legend-group-checkbox', groupRow);
+                    checkbox.type = 'checkbox';
+                    checkbox.id = 'filter-cat-' + entry.category.replace(/\s+/g, '-');
+
+                    //colored swatch with icon image:
+                    var swatch = L.DomUtil.create('span', 'legend-swatch', groupRow);
+                    swatch.style.background = entry.color;
+                    if (entry.iconFile) {
+                        var swatchImg = document.createElement('img');
+                        swatchImg.src = 'img/map-icons/' + entry.iconFile;
+                        swatchImg.style.cssText = 'width:16px;height:16px;filter:brightness(0) invert(1);display:block;margin:2px auto 0;';
+                        swatch.appendChild(swatchImg);
+                    }
+
+                    // labeling
+                    var label = L.DomUtil.create('label', 'legend-group-label', groupRow);
+                    label.htmlFor     = checkbox.id;
+                    label.textContent = entry.category;
+
+                    // Checkbox change → update filter and re-apply
+                    L.DomEvent.on(checkbox, 'change', function() {
+                        if (checkbox.checked) {
+                            activeFilters.categories.add(entry.category);
+                        } else {
+                            activeFilters.categories.delete(entry.category);
+                        }
+                        applyFilters();
+                    });
+                });
+
+                // Clear all category filters button
+                var clearBtn = L.DomUtil.create('button', 'navmenu-clear-filters', content);
+                clearBtn.textContent = 'Clear Category Filters';
+                L.DomEvent.on(clearBtn, 'click', function() {
+                    activeFilters.categories.clear();
+                    legend.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+                        cb.checked = false;
+                    });
+                    applyFilters();
+                });  
+
+                //Time radio buttons:
+                var timeHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
+                timeHeading.innerHTML = '<b>Filter by Time </b>';
+
+                var timeOptions = L.DomUtil.create('div', '', content);
+                timeOptions.innerHTML = `
+                   
                     <div>
                         <input type = 'radio' class = 'inputbutton' id = 'rightnow' name = 'availability' value = 'rightnow'>
                         <label for = 'rightnow'>Right Now</label>
@@ -532,34 +578,77 @@
                         <label for = 'custom'>Custom</label>
                     </div>
                     <div id = 'custom-time-input' style = 'display: none;'>
-                        <input type = 'time' id = 'custom-time' placeholder='Select time (HH:MM)'>
+                        <div class="custom-time-row">
+                            <select id="custom-day">
+                                <option value="0">Monday</option>
+                                <option value="1">Tuesday</option>
+                                <option value="2">Wednesday</option>
+                                <option value="3">Thursday</option>
+                                <option value="4">Friday</option>
+                                <option value="5">Saturday</option>
+                                <option value="6">Sunday</option>
+                            </select>
+                            <input type="text" id="custom-time" placeholder="HH:MM">
+                        </div>
                     </div>
                 `;
 
-                var radios = content.querySelectorAll('input[name="availability"]');
-                var customTimeInput = content.querySelector('#custom-time');
-                var customTimeContainer = content.querySelector('#custom-time-input');
+                var radios = timeOptions.querySelectorAll('input[name="availability"]');
+                var customTimeInput = timeOptions.querySelector('#custom-time');
+                var customTimeContainer = timeOptions.querySelector('#custom-time-input');
+
+                var customDaySelect = timeOptions.querySelector('#custom-day');
+
+                // Set the day selector to default to today's day
+                var todayIndex = (new Date().getDay() + 6) % 7;
+                customDaySelect.value = String(todayIndex);
+
+                L.DomEvent.on(customTimeInput, 'change', function() {
+                    activeFilters.customTime = customTimeInput.value;
+                    activeFilters.customDay  = parseInt(customDaySelect.value);
+                    applyFilters();
+                });
+
+                L.DomEvent.on(customTimeInput, 'focus', function() {
+                    customTimeInput.type = 'time';
+                });
+
+                L.DomEvent.on(customTimeInput, 'blur', function() {
+                    if (!customTimeInput.value) {
+                        customTimeInput.type = 'text';
+                    }
+                });
+
+                L.DomEvent.on(customDaySelect, 'change', function() {
+                    activeFilters.customDay = parseInt(customDaySelect.value);
+                    applyFilters();
+                });
 
                 radios.forEach(function(radio) {
                     L.DomEvent.on(radio, 'change', function() { // When one of the radio buttons is pressed...
                         activeFilters.timeMode = radio.value; // Change the value of activeFilters's timeMode attribute to the value of that radio button ('rightnow', 'anytime', or 'custom'.)
+                        
+                        customTimeContainer.style.display = radio.value === 'custom' ? 'block' : 'none';
 
-                        // Show/hide custom time input
-                        if (radio.value === 'custom') {
-                            customTimeContainer.style.display = 'block'
-                        } else {
-                            customTimeContainer.style.display = 'none'
-                        }
+                        // // Show/hide custom time input
+                        // if (radio.value === 'custom') {
+                        //     customTimeContainer.style.display = 'block'
+                        // } else {
+                        //     customTimeContainer.style.display = 'none'
+                        // }
 
                         applyFilters();
                     });
                 });
 
+
+
                 // Listen for custom time changes
                 L.DomEvent.on(customTimeInput, 'change', function() {
                     activeFilters.customTime = customTimeInput.value;
                     applyFilters();
-                })
+                });
+  
 
                 // Disable click propagation
                 L.DomEvent.disableClickPropagation(container);
@@ -568,46 +657,10 @@
             }
         });
 
+
+
         map.addControl(new timeFilter());
     };
-
-    // Create event repeat filter control -- Nonfunctional, as of 4/30 data does not differentiate between pop-up and repeating events, staying commented in case that changes.
-    //function createRepeatFilter() {
-    //    // Initialize filter menu
-    //    var repeatFilter = L.Control.extend({
-    //        options: {position: 'topleft'},
-    //
-    //        onAdd: function () {
-    //            // Create control container div
-    //            var container = L.DomUtil.create('div', 'repeatfilter-container');
-    //
-    //            // Container content
-    //            var content = L.DomUtil.create('div', 'repeatfilter-content', container);
-    //            content.innerHTML = `
-    //                <p>Location Frequency</p>
-    //                <div>
-    //                    <input type = 'radio' id = 'all' name = 'frequency' value = 'all'>
-    //                    <label for = 'all'>All</label>
-    //                </div>
-    //                <div>
-    //                    <input type = 'radio' id = 'recurring' name = 'frequency' value = 'recurring'>
-    //                    <label for = 'recurring'>Recurring</label>
-    //                </div>
-    //                <div>
-    //                    <input type = 'radio' id = 'popup' name = 'frequency' value = 'popup'>
-    //                    <label for = 'popup'>Pop-up (one-time)</label>
-    //                </div>
-    //            `;
-    //
-    //            // Disable click propagation
-    //            L.DomEvent.disableClickPropagation(container);
-    //
-    //            return container;
-    //        }
-    //    });
-    //
-    //    map.addControl(new repeatFilter());
-    //};
 
     // ── Welcome modal ───────────────────────────────────────────────────────────
     function initWelcomeModal() {
@@ -663,21 +716,7 @@
     // ── Navigation menu (top-right hamburger) ───────────────────────────────────
     // Before login: shows only "Login".
     // After login or guest: shows "Locations", "Profile", and "Logout".
-    function createNavMenu(geojson) {
-        //creating list to house unique categories for nav menu - jc
-        var seenCats = {};
-        var catsInData = [];
-        (geojson ? geojson.features : []).forEach(function(feature) {
-            var cat = (feature.properties && feature.properties.Category) || '';
-            if (cat && !seenCats[cat]) {
-                seenCats[cat] = true;
-                catsInData.push({
-                    category: cat,
-                    iconFile: feature.properties.iconFile || '',
-                    color: (CATEGORY_META[cat] && CATEGORY_META[cat].color) || '#555555'
-                });
-            }
-        });
+    function createNavMenu() {
 
         var navMenu = L.Control.extend({
             options: {position: 'topright'},
@@ -712,56 +751,57 @@
                     content.innerHTML = '<p><a href="login.html">Login</a></p>';
                 }
 
-                // setting up filter legend - jc
-                var filterHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
-                filterHeading.innerHTML = '<b>Filter by Category</b>';
+                // // setting up filter legend - jc
+                // var filterHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
+                // filterHeading.innerHTML = '<b>Filter by Category</b>';
 
-                var legend = L.DomUtil.create('div', 'navmenu-legend', content);
+                // var legend = L.DomUtil.create('div', 'navmenu-legend', content);
 
-                catsInData.forEach(function(entry) {
-                    var groupRow = L.DomUtil.create('div', 'legend-group-row', legend);
+                // catsInData.forEach(function(entry) {
+                //     var groupRow = L.DomUtil.create('div', 'legend-group-row', legend);
 
-                    //checkboxes - jc
-                    var checkbox = L.DomUtil.create('input', 'legend-group-checkbox', groupRow);
-                    checkbox.type = 'checkbox';
-                    checkbox.id = 'filter-cat-' + entry.category.replace(/\s+/g, '-');
+                //     //checkboxes - jc
+                //     var checkbox = L.DomUtil.create('input', 'legend-group-checkbox', groupRow);
+                //     checkbox.type = 'checkbox';
+                //     checkbox.id = 'filter-cat-' + entry.category.replace(/\s+/g, '-');
 
-                    //colored swatch with icon image:
-                    var swatch = L.DomUtil.create('span', 'legend-swatch', groupRow);
-                    swatch.style.background = entry.color;
-                    if (entry.iconFile) {
-                        var swatchImg = document.createElement('img');
-                        swatchImg.src = 'img/map-icons/' + entry.iconFile;
-                        swatchImg.style.cssText = 'width:9px;height:9px;filter:brightness(0) invert(1);display:block;margin:2px auto 0;';
-                        swatch.appendChild(swatchImg);
-                    }
+                //     //colored swatch with icon image:
+                //     var swatch = L.DomUtil.create('span', 'legend-swatch', groupRow);
+                //     swatch.style.background = entry.color;
+                //     if (entry.iconFile) {
+                //         var swatchImg = document.createElement('img');
+                //         swatchImg.src = 'img/map-icons/' + entry.iconFile;
+                //         swatchImg.style.cssText = 'width:9px;height:9px;filter:brightness(0) invert(1);display:block;margin:2px auto 0;';
+                //         swatch.appendChild(swatchImg);
+                //     }
 
-                    // labeling
-                    var label = L.DomUtil.create('label', 'legend-group-label', groupRow);
-                    label.htmlFor     = checkbox.id;
-                    label.textContent = entry.category;
+                //     // labeling
+                //     var label = L.DomUtil.create('label', 'legend-group-label', groupRow);
+                //     label.htmlFor     = checkbox.id;
+                //     label.textContent = entry.category;
 
-                    // Checkbox change → update filter and re-apply
-                    L.DomEvent.on(checkbox, 'change', function() {
-                        if (checkbox.checked) {
-                            activeFilters.categories.add(entry.category);
-                        } else {
-                            activeFilters.categories.delete(entry.category);
-                        }
-                        applyFilters();
-                    });
-                });
+                //     // Checkbox change → update filter and re-apply
+                //     L.DomEvent.on(checkbox, 'change', function() {
+                //         if (checkbox.checked) {
+                //             activeFilters.categories.add(entry.category);
+                //         } else {
+                //             activeFilters.categories.delete(entry.category);
+                //         }
+                //         applyFilters();
+                //     });
+                // });
 
-                // Clear all category filters button
-                var clearBtn = L.DomUtil.create('button', 'navmenu-clear-filters', content);
-                clearBtn.textContent = 'Clear Category Filters';
-                L.DomEvent.on(clearBtn, 'click', function() {
-                    activeFilters.categories.clear();
-                    legend.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
-                        cb.checked = false;
-                    });
-                    applyFilters();
-                });                   
+                // // Clear all category filters button
+                // var clearBtn = L.DomUtil.create('button', 'navmenu-clear-filters', content);
+                // clearBtn.textContent = 'Clear Category Filters';
+                // L.DomEvent.on(clearBtn, 'click', function() {
+                //     activeFilters.categories.clear();
+                //     legend.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+                //         cb.checked = false;
+                //     });
+                //     applyFilters();
+                // });      
+
 
                 // Toggle the content on/off when the menu button is clicked
                 L.DomEvent.on(button, 'click', function() {
