@@ -6,7 +6,6 @@
     var locationsLayer; // Enables filtering via search and other filter controls
     var accessMode = sessionStorage.getItem('commonGoodAccessMode')
     var activeFilters = { searchTerm: '', timeMode: 'anytime', categories: new Set(), customDay: null };
-    // var activeFilters = { searchTerm: '', timeMode: 'anytime'}; // updating so filters work in concert -jc
     var MAP_ICON_ALLOWLIST = [
         'bicycle.svg',
         'courthouse.svg',
@@ -108,8 +107,6 @@
 
         // Add tileset
         L.tileLayer('https://api.thunderforest.com/transport/{z}/{x}/{y}.{ext}?apikey=848f71faa05242a78e5ca550fa29890f', {
-            // apikey: 848f71faa05242a78e5ca550fa29890f,
-        // L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_terrain/{z}/{x}/{y}{r}.{ext}', {
             minZoom: 0,
             maxZoom: 20,
             attribution: '&copy; <a href="https://www.thundermaps.com/" target="_blank">ThunderMaps</a> &copy;  <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -133,11 +130,8 @@
                 createTimeFilter(json);
             });
 
-        // createNavMenu();
         createInfoButton();
         createSearchFilter();
-        // createTimeFilter(json);
-        // createRepeatFilter(); -- Nonfunctional, see createRepeatFilter() definition.
         createZoom();
     };
 
@@ -221,27 +215,6 @@
             }
         }).addTo(map);
     }
-
-// COMMENTING OUT TO TEST SYMBOL CREATION: -jc
-// function createSymbols(data) {
-//         locationsLayer = L.geoJson(data, { // Assign pseudoglobal variable data to make searching possible
-//             pointToLayer: function(feature, latlng){
-//                 if (feature.properties && feature.properties.iconFile) {
-//                     var customIcon = buildMapIcon(feature.properties.iconFile);
-//                     if (customIcon) {
-//                         return L.marker(latlng, { icon: customIcon });
-//                     }
-//                 }
-//                 return L.marker(latlng);
-//             },
-//             onEachFeature: function(feature, layer) {
-//                 // Build popup content, established here because popups themselves do not change.
-//                 layer.properties = feature.properties;
-//                 var popupContent = buildPopupContent(layer.properties);
-//                 layer.bindPopup(popupContent);
-//             }
-//         }).addTo(map);
-// }
 
     // ── User-created locations from sessionStorage ──────────────────────────────
     // Star-shaped div icon used to mark locations created by the current user on the map.
@@ -634,13 +607,6 @@
                         
                         customTimeContainer.style.display = radio.value === 'custom' ? 'block' : 'none'; // Show the custom time row only when 'Custom' is selected
 
-                        // // Show/hide custom time input
-                        // if (radio.value === 'custom') {
-                        //     customTimeContainer.style.display = 'block'
-                        // } else {
-                        //     customTimeContainer.style.display = 'none'
-                        // }
-
                         applyFilters();
                     });
                 });
@@ -758,58 +724,6 @@
                     // No active session: show only Login
                     content.innerHTML = '<p><a href="login.html">Login</a></p>';
                 }
-
-                // // setting up filter legend - jc
-                // var filterHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
-                // filterHeading.innerHTML = '<b>Filter by Category</b>';
-
-                // var legend = L.DomUtil.create('div', 'navmenu-legend', content);
-
-                // catsInData.forEach(function(entry) {
-                //     var groupRow = L.DomUtil.create('div', 'legend-group-row', legend);
-
-                //     //checkboxes - jc
-                //     var checkbox = L.DomUtil.create('input', 'legend-group-checkbox', groupRow);
-                //     checkbox.type = 'checkbox';
-                //     checkbox.id = 'filter-cat-' + entry.category.replace(/\s+/g, '-');
-
-                //     //colored swatch with icon image:
-                //     var swatch = L.DomUtil.create('span', 'legend-swatch', groupRow);
-                //     swatch.style.background = entry.color;
-                //     if (entry.iconFile) {
-                //         var swatchImg = document.createElement('img');
-                //         swatchImg.src = 'img/map-icons/' + entry.iconFile;
-                //         swatchImg.style.cssText = 'width:9px;height:9px;filter:brightness(0) invert(1);display:block;margin:2px auto 0;';
-                //         swatch.appendChild(swatchImg);
-                //     }
-
-                //     // labeling
-                //     var label = L.DomUtil.create('label', 'legend-group-label', groupRow);
-                //     label.htmlFor     = checkbox.id;
-                //     label.textContent = entry.category;
-
-                //     // Checkbox change → update filter and re-apply
-                //     L.DomEvent.on(checkbox, 'change', function() {
-                //         if (checkbox.checked) {
-                //             activeFilters.categories.add(entry.category);
-                //         } else {
-                //             activeFilters.categories.delete(entry.category);
-                //         }
-                //         applyFilters();
-                //     });
-                // });
-
-                // // Clear all category filters button
-                // var clearBtn = L.DomUtil.create('button', 'navmenu-clear-filters', content);
-                // clearBtn.textContent = 'Clear Category Filters';
-                // L.DomEvent.on(clearBtn, 'click', function() {
-                //     activeFilters.categories.clear();
-                //     legend.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
-                //         cb.checked = false;
-                //     });
-                //     applyFilters();
-                // });      
-
 
                 // Toggle the content on/off when the menu button is clicked
                 L.DomEvent.on(button, 'click', function() {
