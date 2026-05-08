@@ -607,26 +607,22 @@
                 var todayIndex = (new Date().getDay() + 6) % 7; // Convert JS Sunday=0 to Monday=0 index
                 customDaySelect.value = String(todayIndex);
 
-                // Update both time and day filters when the custom time value changes
                 L.DomEvent.on(customTimeInput, 'change', function() {
                     activeFilters.customTime = customTimeInput.value;
                     activeFilters.customDay  = parseInt(customDaySelect.value);
                     applyFilters();
                 });
 
-                // Switch input type to 'time' on focus so the browser shows a time picker
                 L.DomEvent.on(customTimeInput, 'focus', function() {
                     customTimeInput.type = 'time';
                 });
 
-                // Revert to 'text' type on blur if no value entered, so placeholder text is visible
                 L.DomEvent.on(customTimeInput, 'blur', function() {
                     if (!customTimeInput.value) {
                         customTimeInput.type = 'text';
                     }
                 });
 
-                // Re-apply filters immediately when the user changes the selected day
                 L.DomEvent.on(customDaySelect, 'change', function() {
                     activeFilters.customDay = parseInt(customDaySelect.value);
                     applyFilters();
@@ -651,7 +647,7 @@
 
 
 
-                // Secondary listener for custom time changes (covers edge cases not caught by the first listener above)
+                // Listen for custom time changes
                 L.DomEvent.on(customTimeInput, 'change', function() {
                     activeFilters.customTime = customTimeInput.value;
                     applyFilters();
@@ -815,12 +811,12 @@
                 // });      
 
 
-                // Toggle the expanded CSS class on the container to show or hide the nav menu content
+                // Toggle the content on/off when the menu button is clicked
                 L.DomEvent.on(button, 'click', function() {
                     if (L.DomUtil.hasClass(container, 'expanded')) {
-                        L.DomUtil.removeClass(container, 'expanded'); // Collapse the menu
+                        L.DomUtil.removeClass(container, 'expanded');
                     } else {
-                        L.DomUtil.addClass(container, 'expanded'); // Expand the menu
+                        L.DomUtil.addClass(container, 'expanded');
                     }
                 });
 
