@@ -130,9 +130,9 @@
                 createTimeFilter(json);
             });
 
-        createInfoButton();
-        createSearchFilter();
-        createZoom();
+        createInfoButton(); // adds info button
+        createSearchFilter(); // adds search filter
+        createZoom(); // adds zoom
     };
 
     // This escapes special HTML characters in a value so it is safe to insert into popup content.
@@ -310,7 +310,7 @@
 
 
                 // Disable click propagation
-                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.disableClickPropagation(container); // this allows for scrolling within the container
 
                 return container;
             }
@@ -485,13 +485,13 @@
                 
 
                 // setting up filter legend - jc
-                var filterHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
+                var filterHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content); // text box heading
                 filterHeading.innerHTML = '<b>Filter by Category</b>';
 
                 var legend = L.DomUtil.create('div', 'navmenu-legend', content);
 
                 catsInData.forEach(function(entry) {
-                    var groupRow = L.DomUtil.create('div', 'legend-group-row', legend);
+                    var groupRow = L.DomUtil.create('div', 'legend-group-row', legend); // iterate through categories in cats and add to legend
 
                     //checkboxes - jc
                     var checkbox = L.DomUtil.create('input', 'legend-group-checkbox', groupRow);
@@ -504,6 +504,7 @@
                     if (entry.iconFile) {
                         var swatchImg = document.createElement('img');
                         swatchImg.src = 'img/map-icons/' + entry.iconFile;
+                     //play around with the width and height to create different sized badges in legend
                         swatchImg.style.cssText = 'width:16px;height:16px;filter:brightness(0) invert(1);display:block;margin:2px auto 0;';
                         swatch.appendChild(swatchImg);
                     }
@@ -539,7 +540,7 @@
                 var timeHeading = L.DomUtil.create('p', 'navmenu-filter-heading', content);
                 timeHeading.innerHTML = '<b>Filter by Time </b>';
 
-                var timeOptions = L.DomUtil.create('div', '', content);
+                var timeOptions = L.DomUtil.create('div', '', content); // top is for right now radio button, middle for anytime, and bottom sets up custom time filter with day selector
                 timeOptions.innerHTML = `
                    
                     <div>
@@ -583,7 +584,7 @@
                 L.DomEvent.on(customTimeInput, 'change', function() {
                     activeFilters.customTime = customTimeInput.value;
                     activeFilters.customDay  = parseInt(customDaySelect.value);
-                    applyFilters();
+                    applyFilters(); // applies filters if active filters have been used, removing icons from the map
                 });
 
                 L.DomEvent.on(customTimeInput, 'focus', function() {
@@ -593,7 +594,7 @@
                 L.DomEvent.on(customTimeInput, 'blur', function() {
                     if (!customTimeInput.value) {
                         customTimeInput.type = 'text';
-                    }
+                    } // set input for the time to be the text, HH:MM, to encourage people to type in hour and minute format
                 });
 
                 L.DomEvent.on(customDaySelect, 'change', function() {
