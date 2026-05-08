@@ -21,17 +21,18 @@
     
     var iconSvgCache = {};
 
+    // Fetches an SVG icon file by name, using a cache to avoid redundant network requests.
     function fetchIconSvg(iconFile, callback) {
-        if (!iconFile) { callback(''); return;}
-        if (iconSvgCache[iconFile]) { callback(iconSvgCache[iconFile]); return; }
+        if (!iconFile) { callback(''); return;} // No icon specified, return empty string immediately
+        if (iconSvgCache[iconFile]) { callback(iconSvgCache[iconFile]); return; } // Return cached SVG if already fetched
 
         fetch('img/map-icons/' + iconFile)
-            .then(function(r) { return r.text(); })
+            .then(function(r) { return r.text(); }) // Read response body as text
             .then(function(svgText) {
-                iconSvgCache[iconFile] = svgText;
+                iconSvgCache[iconFile] = svgText; // Store result in cache for future calls
                 callback(svgText);
             })
-            .catch(function() { callback(''); });
+            .catch(function() { callback(''); }); // On error, return empty string to avoid breaking the icon build
     }
 
 
@@ -70,6 +71,7 @@
         });
     }
 
+    // Maps each location category name to its associated pin color used in buildMapIcon.
     var CATEGORY_META = {
             'Bicycle Access': { color: '#3a86cc' },
             'Food':           { color: '#e05c2a' },
@@ -84,12 +86,12 @@
 
     // ── Guest session: clear data on page reload ────────────────────────────────
     function handleGuestReload() {
-        var navigationEntries = performance.getEntriesByType('navigation');
-        var navigationType = navigationEntries.length ? navigationEntries[0].type : '';
+        var navigationEntries = performance.getEntriesByType('navigation'); // Retrieve navigation timing entries
+        var navigationType = navigationEntries.length ? navigationEntries[0].type : ''; // Extract the navigation type (e.g. 'reload', 'navigate')
 
         if (accessMode === 'guest' && navigationType === 'reload') {
-            sessionStorage.clear();
-            accessMode = null;
+            sessionStorage.clear(); // Wipe guest session data so the user is not left in a partial state after reload
+            accessMode = null; // Reset local access mode to prevent stale guest state
         }
     }
 
@@ -242,6 +244,7 @@
 // }
 
     // ── User-created locations from sessionStorage ──────────────────────────────
+    // Star-shaped div icon used to mark locations created by the current user on the map.
     var userStarIcon = L.divIcon({
         className: '',
         html: '<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">' +
@@ -249,24 +252,25 @@
               'fill="#f5a623" stroke="#b8740a" stroke-width="1.5" stroke-linejoin="round"/>' +
               '</svg>',
         iconSize: [34, 34],
-        iconAnchor: [17, 17],
-        popupAnchor: [0, -18]
+        iconAnchor: [17, 17], // Anchor at center of icon
+        popupAnchor: [0, -18] // Popup appears above the icon
     });
 
     function addUserLocations() {
         var raw;
         try {
-            raw = JSON.parse(sessionStorage.getItem('commonGoodCreatedLocations') || '[]');
+            raw = JSON.parse(sessionStorage.getItem('commonGoodCreatedLocations') || '[]'); // Parse stored user locations from sessionStorage
         } catch (e) {
-            raw = [];
+            raw = []; // Fall back to empty array if stored data is malformed
         }
 
         raw.forEach(function (entry, index) {
-            if (!entry || typeof entry !== 'object') { return; }
+            if (!entry || typeof entry !== 'object') { return; } // Skip invalid entries
             var lat = entry.lat;
             var lon = entry.lon;
-            if (lat === null || lat === undefined || lon === null || lon === undefined) { return; }
+            if (lat === null || lat === undefined || lon === null || lon === undefined) { return; } // Skip entries missing coordinates
 
+            // Build a GeoJSON-style feature object from the stored entry data
             var feature = {
                 type: 'Feature',
                 properties: {
@@ -276,8 +280,8 @@
                     Hours: entry.hours || '',
                     Link: entry.siteUrl || '',
                     Services: entry.servicesText || '',
-                    isUserCreated: true,
-                    userLocationId: entry.locationId || ('legacy-' + index)
+                    isUserCreated: true, // Flag used by buildDetailsUrl to generate the correct detail page link
+                    userLocationId: entry.locationId || ('legacy-' + index) // Use stored ID or fall back to index-based ID for older entries
                 },
                 geometry: {
                     type: 'Point',
@@ -285,10 +289,10 @@
                 }
             };
 
-            var marker = L.marker([lat, lon], { icon: userStarIcon });
+            var marker = L.marker([lat, lon], { icon: userStarIcon }); // Place the star icon at the user's stored coordinates
             marker.properties = feature.properties;
             marker.bindPopup(buildPopupContent(feature.properties));
-            locationsLayer.addLayer(marker);
+            locationsLayer.addLayer(marker); // Add directly to locationsLayer so it participates in filtering
         });
     }
 
@@ -482,16 +486,16 @@
     function createTimeFilter(geojson) {
 
         // set up categories for filter & legend
-        var seenCats = {};
-        var catsInData = [];
+        var seenCats = {}; // Tracks categories already added to prevent duplicates
+        var catsInData = []; // Ordered list of unique category objects to render in the legend
         (geojson ? geojson.features : []).forEach(function(feature) {
             var cat = (feature.properties && feature.properties.Category) || '';
             if (cat && !seenCats[cat]) {
                 seenCats[cat] = true;
                 catsInData.push({
                     category: cat,
-                    iconFile: feature.properties.iconFile || '',
-                    color: (CATEGORY_META[cat] && CATEGORY_META[cat].color) || '#555555'
+                    iconFile: feature.properties.iconFile || '', // Icon image file name for the legend swatch
+                    color: (CATEGORY_META[cat] && CATEGORY_META[cat].color) || '#555555' // Use CATEGORY_META color or fall back to grey
                 });
             }
         });
@@ -600,25 +604,29 @@
                 var customDaySelect = timeOptions.querySelector('#custom-day');
 
                 // Set the day selector to default to today's day
-                var todayIndex = (new Date().getDay() + 6) % 7;
+                var todayIndex = (new Date().getDay() + 6) % 7; // Convert JS Sunday=0 to Monday=0 index
                 customDaySelect.value = String(todayIndex);
 
+                // Update both time and day filters when the custom time value changes
                 L.DomEvent.on(customTimeInput, 'change', function() {
                     activeFilters.customTime = customTimeInput.value;
                     activeFilters.customDay  = parseInt(customDaySelect.value);
                     applyFilters();
                 });
 
+                // Switch input type to 'time' on focus so the browser shows a time picker
                 L.DomEvent.on(customTimeInput, 'focus', function() {
                     customTimeInput.type = 'time';
                 });
 
+                // Revert to 'text' type on blur if no value entered, so placeholder text is visible
                 L.DomEvent.on(customTimeInput, 'blur', function() {
                     if (!customTimeInput.value) {
                         customTimeInput.type = 'text';
                     }
                 });
 
+                // Re-apply filters immediately when the user changes the selected day
                 L.DomEvent.on(customDaySelect, 'change', function() {
                     activeFilters.customDay = parseInt(customDaySelect.value);
                     applyFilters();
@@ -628,7 +636,7 @@
                     L.DomEvent.on(radio, 'change', function() { // When one of the radio buttons is pressed...
                         activeFilters.timeMode = radio.value; // Change the value of activeFilters's timeMode attribute to the value of that radio button ('rightnow', 'anytime', or 'custom'.)
                         
-                        customTimeContainer.style.display = radio.value === 'custom' ? 'block' : 'none';
+                        customTimeContainer.style.display = radio.value === 'custom' ? 'block' : 'none'; // Show the custom time row only when 'Custom' is selected
 
                         // // Show/hide custom time input
                         // if (radio.value === 'custom') {
@@ -643,7 +651,7 @@
 
 
 
-                // Listen for custom time changes
+                // Secondary listener for custom time changes (covers edge cases not caught by the first listener above)
                 L.DomEvent.on(customTimeInput, 'change', function() {
                     activeFilters.customTime = customTimeInput.value;
                     applyFilters();
@@ -667,18 +675,21 @@
         var backdrop = document.getElementById('welcome-backdrop');
         var closeBtn = document.getElementById('welcome-close-btn');
 
-        if (!backdrop || !closeBtn) { return; }
+        if (!backdrop || !closeBtn) { return; } // Exit early if modal elements are not present in the DOM
 
+        // Hides the modal by adding the hidden CSS class to the backdrop element
         function closeModal() {
             backdrop.classList.add('welcome-backdrop--hidden');
         }
 
-        closeBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', closeModal); // Close when the explicit close button is clicked
 
+        // Close when the user clicks the backdrop area outside the modal box
         backdrop.addEventListener('click', function (e) {
             if (e.target === backdrop) { closeModal(); }
         });
 
+        // Close when the Escape key is pressed, only if the modal is currently visible
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && !backdrop.classList.contains('welcome-backdrop--hidden')) {
                 closeModal();
@@ -694,18 +705,19 @@
             onAdd: function () {
                 var btn = L.DomUtil.create('button', 'info-btn');
                 btn.type = 'button';
-                btn.setAttribute('aria-label', 'About CommonGood');
-                btn.title = 'About CommonGood';
-                btn.innerHTML = '<span aria-hidden="true">i</span>';
+                btn.setAttribute('aria-label', 'About CommonGood'); // Accessibility label for screen readers
+                btn.title = 'About CommonGood'; // Tooltip shown on hover
+                btn.innerHTML = '<span aria-hidden="true">i</span>'; // Visual 'i' glyph, hidden from screen readers since aria-label covers it
 
+                // Re-show the welcome modal when the info button is clicked
                 L.DomEvent.on(btn, 'click', function () {
                     var backdrop = document.getElementById('welcome-backdrop');
                     if (backdrop) {
-                        backdrop.classList.remove('welcome-backdrop--hidden');
+                        backdrop.classList.remove('welcome-backdrop--hidden'); // Remove hidden class to make the modal visible again
                     }
                 });
 
-                L.DomEvent.disableClickPropagation(btn);
+                L.DomEvent.disableClickPropagation(btn); // Prevent click from passing through to the map
                 return btn;
             }
         });
@@ -742,9 +754,9 @@
                     // Wire logout to clear session before navigating
                     var logoutLink = content.querySelector('#logout-nav-link');
                     L.DomEvent.on(logoutLink, 'click', function() {
-                        sessionStorage.removeItem('commonGoodAccessMode');
-                        sessionStorage.removeItem('commonGoodUserEmail');
-                        window.location.href = 'index.html';
+                        sessionStorage.removeItem('commonGoodAccessMode'); // Remove access mode so the user is treated as logged out
+                        sessionStorage.removeItem('commonGoodUserEmail'); // Remove stored email to fully clear the session
+                        window.location.href = 'index.html'; // Redirect to the landing page
                     });
                 } else {
                     // No active session: show only Login
@@ -803,12 +815,12 @@
                 // });      
 
 
-                // Toggle the content on/off when the menu button is clicked
+                // Toggle the expanded CSS class on the container to show or hide the nav menu content
                 L.DomEvent.on(button, 'click', function() {
                     if (L.DomUtil.hasClass(container, 'expanded')) {
-                        L.DomUtil.removeClass(container, 'expanded');
+                        L.DomUtil.removeClass(container, 'expanded'); // Collapse the menu
                     } else {
-                        L.DomUtil.addClass(container, 'expanded');
+                        L.DomUtil.addClass(container, 'expanded'); // Expand the menu
                     }
                 });
 
