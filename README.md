@@ -17,23 +17,26 @@ In addition to services community members are interested in providing, this app 
 
     ii. Scenario - Ray decides to list his workspace as a "Community Tool Bench" on the CommonGood website both to pass down his skills to others and make sure people can afford to fix their own cars when they need to. He accesses the site on his tablet, and the Leaflet-powered interface immediately centers on his area, showing him a clear, uncluttered map of nearby resources. Ray clicks the options menu on the map, creates an account, then clicks the button to create a new location. In the location management page that opens, he fills out the information to categorize his space as a "Repair/Tool Share" facility with "Skilled teaching assistance" options available. He sets a specific availability window for Saturdays 9 to 5 and includes a brief note about his hydraulic press. Once he hits "Save Changes," his barn appears as a new pin on the OpenStreetMap base layer, instantly visible to anyone in Madison who might be looking for a way to keep their car running without a trip to the dealership.
 
-3. Requirements
+1. Requirements
 
-   - We had issues formatting the table properly in Markdown, hosting in Google Drive until we can figure it out. [Requirements Document](https://drive.google.com/file/d/1lXDzxHTPQgGn7bqSSPCL4cQ98yh_4R07/view?usp=sharing)
-
-   1. Frontend - Javascript
-      
-   2. Mapping Engine: - Leaflet.js
-      
-   3. Backend - Node.js or Django
-      
-   4. Base Maps - OpenStreetMap (OSM) tiles
-        
-   5. Geocoding - Nominatim (via OSM)
+    | ***Representation*** |||
+    |---|---|---|
+    |1|Basemap  | The CommonGood map would primarily need to be themed around simplicity and community-centered design. Midcentury from Leaflet fits the bill nicely. |
+    |2|Community Aid Points|Primarily sourced from users of the app. Icons adjust based on the service provided, obtained from The Noun Project (pending?) Data will be input manually for the first iteration, and users will be able to use the GUI to update the backend spreadsheet, adding their own points to the map.|
+    | ***Interaction*** |||
+    |1|Map Browsing|*Zoom* + *Pan* provided natively with direct manipulation via Leaflet.|
+    |2|Address / Service Type Search|*Zoom*: Use geocoding to center the map on a location of interest, if an address is typed. *Retrieve*: Locations added to the CommonGood map have tags that Hosts can add, e.g. “Food Pantry”, “Free Wi-Fi”, etc. Guests can filter locations by these tags via typing them into the Search widget.|
+    |3|Community Aid Point Popup|*Retrieve*: Click directly on a marked location on the map to open a popup containing:<br>- Location name<br>- Operating hours<br>- Services provided<br>- Contact information (Phone number, Signal username, etc.)<br>- Favorite button (described in Non-Map Functionality)<br>- Details (Opens a Host-established interface, made in the Location Management Page described in Non-map Functionality.|
+    |4|Time Filter|*Filter*: Locations can list their hours of operations and/or timeframes for events. A widget of radio buttons can filter locations by whether they have an active event/are open at the current time, open within a user-defined time frame, or at any time.|
+    |5|Recurring/Pop-up Event Filter|*Filter*: Events can either be Pop-ups, i.e. a one-time event at a location, or recurring. A widget on the map containing radio buttons can filter between locations that have Pop-up or recurring events, or the filter can be disabled and show all events.|
+    |***Non-map Functionality*** |Not strictly map-related functions, but still necessary for the functionality of the app overall.||
+    |1|Location Favoriting|Users can log in to the app, which allows them to Favorite locations if they want to revisit them at a later time.|
+    |2|Host Dashboard|A landing page meant to provide quick access to Host functions and data, like creating an event at one of their Community Aid locations, scheduling a break, visualizing popularity metrics, etc.|
+    |3|Location Management Page|A page to customize a Host’s Community Aid location. Allows uploading a banner photo, creating a page description, a profile photo, and adding what services/materials a Host can provide.|
+    |4|Reservation Calendar|A calendar to aggregate reservations and events to avoid overlap, should a single Host become popular in an area.|
+    |5|Event Manager|Add a title, description, date and time, capacity, and volunteers to a Host’s location.|
        
-   6. Hosting - GitHub Pages (for the frontend) and Render for the full app
-       
-5. Wireframes
+1. Wireframes
 
 - We have a high number of wireframes for this project. Some are included directly on the readme, but all are available via [this presentation.](https://drive.google.com/file/d/1TCon2gbK0nF9bZ7JvxCY7MZW9z0JxAIN/view?usp=sharing)
 
